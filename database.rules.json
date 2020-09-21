@@ -22,36 +22,35 @@
         "votes": {
           "$userId": {
             "$postId": {
-              ".validate": "newData.isBoolean()"
+              ".validate": "(newData.isString() && (newData.val() == 'up' || newData.val() == 'down'))"
             }
           }
         }
       },
       "data": {
-        "$postId": {
-          ".validate": "((((newData.hasChildren() && newData.hasChildren(['type', 'content', 'location'])) && newData.child('type').val() == 'text') && newData.hasChildren(['modified', 'created'])) || ((newData.hasChildren() && newData.hasChildren(['paths'])) && newData.hasChildren(['modified', 'created'])))",
-          "type": {
-            ".validate": "newData.isString()"
-          },
-          "content": {
-            ".validate": "(newData.isString() && newData.val().length < 280)"
-          },
-          "location": {
-            ".validate": "newData.isString()"
-          },
-          "$other": {
-            ".validate": "false"
-          },
-          "modified": {
-            ".validate": "((newData.isNumber() && newData.val() == now) || (newData.isNumber() && newData.val() == now))"
-          },
-          "created": {
-            ".validate": "((newData.isNumber() && newData.val() == (data.val() == null ? now : data.val())) || (newData.isNumber() && newData.val() == (data.val() == null ? now : data.val())))"
-          },
-          "paths": {
-            ".validate": "newData.hasChildren()"
-          },
-          ".write": "(data.val() == null && auth != null)"
+        "posts": {
+          "$postId": {
+            ".validate": "(newData.hasChildren(['type', 'content', 'location', 'modified', 'created']) && newData.child('type').val() == 'text')",
+            "type": {
+              ".validate": "newData.isString()"
+            },
+            "content": {
+              ".validate": "(newData.isString() && newData.val().length < 280)"
+            },
+            "location": {
+              ".validate": "newData.isString()"
+            },
+            "$other": {
+              ".validate": "false"
+            },
+            "modified": {
+              ".validate": "(newData.isNumber() && newData.val() == now)"
+            },
+            "created": {
+              ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
+            },
+            ".write": "(data.val() == null && auth != null)"
+          }
         },
         "votes": {
           "$postId": {

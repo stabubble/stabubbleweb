@@ -30,20 +30,16 @@ type TextMessageContent extends String {
     validate() { this.length < 280 }
 }
 
-type TestMessage {
-    test: Object
-}
-
-type DrawMessage {
-    paths: Object
-}
-
 type TextMessage {
     type: String,
     content: TextMessageContent,
     location: String
 
     validate() { this.type == 'text' }
+}
+
+type VoteDirection extends String{
+    validate() { this == 'up' || this == 'down' }
 }
 
 type Vote {
@@ -65,7 +61,7 @@ path /posts {
             delete() { isCurrentUser(userId) } //&& postDeletedAtSameTime }
         }
 
-        path /votes/{userId}/{postId} is Boolean {
+        path /votes/{userId}/{postId} is VoteDirection {
 
         }
     }
@@ -73,7 +69,7 @@ path /posts {
     path /data {
         read() { isSignedIn() }
 
-        path /{postId} is Timestamped<TextMessage> | Timestamped<DrawMessage> {
+        path /posts/{postId} is Timestamped<TextMessage> {
             create() { isSignedIn() } // && postIdOwned
         }
 
