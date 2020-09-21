@@ -1,0 +1,86 @@
+//==== dev rules
+path / {
+    read() { true }
+    write() { true }
+}
+//====
+
+//===https://github.com/FirebaseExtended/bolt/blob/master/docs/guide.md
+type Timestamped<T> extends T {
+    modified: CurrentTimestamp,
+    created: InitialTimestamp
+}
+
+type CurrentTimestamp extends Number {
+    validate() { this == now }
+}
+
+type InitialTimestamp extends Number {
+    validate() { initial(this, now) }
+}
+
+// Returns true if the value is intialized to init, or retains it's prior value, otherwise.
+initial(value, init) { value == (prior(value) == null ? init : prior(value)) }
+isCurrentUser(uid) { isSignedIn() && auth.uid == uid }
+isSignedIn() { auth != null }
+createOnly(value) { prior(value) == null && value != null }
+//===
+
+type TextMessageContent extends String {
+    validate() { this.length < 280 }
+}
+
+type TestMessage {
+    test: Object
+}
+
+type DrawMessage {
+    paths: Object
+}
+
+type TextMessage {
+    type: String,
+    content: TextMessageContent,
+    location: String
+
+    validate() { this.type == 'text' }
+}
+
+type Vote {
+    up: Number,
+    down: Number
+}
+
+path /users/{userId} {
+    read() { isCurrentUser(userId) }
+    write() { isCurrentUser(userId) }
+}
+
+path /posts {
+
+    path /owner {
+        path /posts/{userId}/{postId} is Boolean {
+            read() { isCurrentUser(userId) }
+            create() { isCurrentUser(userId) } //&& postDoesNotExist }
+            delete() { isCurrentUser(userId) } //&& postDeletedAtSameTime }
+        }
+
+        path /votes/{userId}/{postId} is Boolean {
+
+        }
+    }
+
+    path /data {
+        read() { isSignedIn() }
+
+        path /{postId} is Timestamped<TextMessage> | Timestamped<DrawMessage> {
+            create() { isSignedIn() } // && postIdOwned
+        }
+
+        path /votes/{postId} is Vote {
+            write() { true }
+        }
+
+    }
+
+}

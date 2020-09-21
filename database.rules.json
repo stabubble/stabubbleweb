@@ -1,0 +1,75 @@
+{
+  "rules": {
+    ".read": "true",
+    ".write": "true",
+    "users": {
+      "$userId": {
+        ".read": "(auth != null && auth.uid == $userId)",
+        ".write": "(auth != null && auth.uid == $userId)"
+      }
+    },
+    "posts": {
+      "owner": {
+        "posts": {
+          "$userId": {
+            "$postId": {
+              ".validate": "newData.isBoolean()",
+              ".write": "((data.val() == null && (auth != null && auth.uid == $userId)) || ((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)))",
+              ".read": "(auth != null && auth.uid == $userId)"
+            }
+          }
+        },
+        "votes": {
+          "$userId": {
+            "$postId": {
+              ".validate": "newData.isBoolean()"
+            }
+          }
+        }
+      },
+      "data": {
+        "$postId": {
+          ".validate": "((((newData.hasChildren() && newData.hasChildren(['type', 'content', 'location'])) && newData.child('type').val() == 'text') && newData.hasChildren(['modified', 'created'])) || ((newData.hasChildren() && newData.hasChildren(['paths'])) && newData.hasChildren(['modified', 'created'])))",
+          "type": {
+            ".validate": "newData.isString()"
+          },
+          "content": {
+            ".validate": "(newData.isString() && newData.val().length < 280)"
+          },
+          "location": {
+            ".validate": "newData.isString()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          "modified": {
+            ".validate": "((newData.isNumber() && newData.val() == now) || (newData.isNumber() && newData.val() == now))"
+          },
+          "created": {
+            ".validate": "((newData.isNumber() && newData.val() == (data.val() == null ? now : data.val())) || (newData.isNumber() && newData.val() == (data.val() == null ? now : data.val())))"
+          },
+          "paths": {
+            ".validate": "newData.hasChildren()"
+          },
+          ".write": "(data.val() == null && auth != null)"
+        },
+        "votes": {
+          "$postId": {
+            ".validate": "newData.hasChildren(['up', 'down'])",
+            "up": {
+              ".validate": "newData.isNumber()"
+            },
+            "down": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": "false"
+            },
+            ".write": "true"
+          }
+        },
+        ".read": "auth != null"
+      }
+    }
+  }
+}
