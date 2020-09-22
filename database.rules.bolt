@@ -24,6 +24,10 @@ initial(value, init) { value == (prior(value) == null ? init : prior(value)) }
 isCurrentUser(uid) { isSignedIn() && auth.uid == uid }
 isSignedIn() { auth != null }
 createOnly(value) { prior(value) == null && value != null }
+postDoesNotExist(postId) { postId != null && root.posts.data.$postId == null}
+postDeletedAtSameTime(postId){postId != null && root.posts.data.$postId == null }
+votedAtSameTimeAndNotVoted(postId){root.}
+removedVoteAtSameTimeAndHasVoted(postId){}
 //===
 
 type TextMessageContent extends String {
@@ -58,13 +62,13 @@ path /posts {
         path /userId {
             read() { isCurrentUser(userId) }
             path /posts/{postId} is Boolean {
-                create() { isCurrentUser(userId) } //&& postDoesNotExist }
-                delete() { isCurrentUser(userId) } //&& postDeletedAtSameTime }
+                create() { isCurrentUser(userId) && postDoesNotExist(postId) }
+                delete() { isCurrentUser(userId)  && postDeletedAtSameTime(postId) }
             }
-    
+
             path /votes/{postId} is VoteDirection {
-                    create() { isCurrentUser(userId) } //&& votedAtSameTimeAndNotVoted }
-                    delete() { isCurrentUser(userId) } //&& remoedVoteAtSameTimeAndHasVoted }
+                    create() { isCurrentUser(userId) && votedAtSameTimeAndNotVoted(postId,VoteDirection) }
+                    delete() { isCurrentUser(userId) && removedVoteAtSameTimeAndHasVoted(postId,VoteDirection) }
             }
         }
     }
