@@ -10,21 +10,20 @@
     },
     "posts": {
       "owner": {
-        "posts": {
-          "$userId": {
+        "userId": {
+          "posts": {
             "$postId": {
               ".validate": "newData.isBoolean()",
-              ".write": "((data.val() == null && (auth != null && auth.uid == $userId)) || ((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)))",
-              ".read": "(auth != null && auth.uid == $userId)"
+              ".write": "((data.val() == null && (auth != null && auth.uid == userId)) || ((data.val() != null && newData.val() == null) && (auth != null && auth.uid == userId)))"
             }
-          }
-        },
-        "votes": {
-          "$userId": {
+          },
+          "votes": {
             "$postId": {
-              ".validate": "(newData.isString() && (newData.val() == 'up' || newData.val() == 'down'))"
+              ".validate": "(newData.isString() && (newData.val() == 'up' || newData.val() == 'down'))",
+              ".write": "((data.val() == null && (auth != null && auth.uid == userId)) || ((data.val() != null && newData.val() == null) && (auth != null && auth.uid == userId)))"
             }
-          }
+          },
+          ".read": "(auth != null && auth.uid == userId)"
         }
       },
       "data": {

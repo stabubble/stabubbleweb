@@ -55,14 +55,17 @@ path /users/{userId} {
 path /posts {
 
     path /owner {
-        path /posts/{userId}/{postId} is Boolean {
+        path /userId {
             read() { isCurrentUser(userId) }
-            create() { isCurrentUser(userId) } //&& postDoesNotExist }
-            delete() { isCurrentUser(userId) } //&& postDeletedAtSameTime }
-        }
-
-        path /votes/{userId}/{postId} is VoteDirection {
-
+            path /posts/{postId} is Boolean {
+                create() { isCurrentUser(userId) } //&& postDoesNotExist }
+                delete() { isCurrentUser(userId) } //&& postDeletedAtSameTime }
+            }
+    
+            path /votes/{postId} is VoteDirection {
+                    create() { isCurrentUser(userId) } //&& votedAtSameTimeAndNotVoted }
+                    delete() { isCurrentUser(userId) } //&& remoedVoteAtSameTimeAndHasVoted }
+            }
         }
     }
 
