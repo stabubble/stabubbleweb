@@ -77,7 +77,7 @@ path /users/{userId} {
 path /posts {
 
     path /owner {
-        path /userId {
+        path /{userId} {
             read() { isCurrentUser(userId) }
             path /posts/{postId} is Boolean {
                 create() { isCurrentUser(userId) && postDoesNotExist(postId) }
@@ -110,7 +110,7 @@ path /posts {
 path /comments {
 
     path /owner {
-        path /userId {
+        path /{userId} {
             read() { isCurrentUser(userId) }
             path /comment/{postId}/{commentId} is Boolean {
                 create() { isCurrentUser(userId) && !postDoesNotExist(postId) && commentDoesNotExist(postId,commentId) }
