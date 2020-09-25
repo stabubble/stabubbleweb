@@ -1,8 +1,8 @@
 //==== dev rules
-path / {
-    read() { true }
-    write() { true }
-}
+//path / {
+//    read() { true }
+//    write() { true }
+//}
 //====
 
 //===https://github.com/FirebaseExtended/bolt/blob/master/docs/guide.md
@@ -48,17 +48,21 @@ commentIdOwned(postId,commentId,userId){
     postId!=null&&commentId!=null&&root.comments.owner.$userId.$postId.$commentId!=null}
 //===
 
+type TextMessageWithLocation extends TextMessage {
+  location: String
+}
+
 type TextMessageContent extends String {
     validate() { this.length < 280 }
 }
 
 type TextMessage {
     type: String,
-    content: TextMessageContent,
-    location: String
+    content: TextMessageContent
 
     validate() { this.type == 'text' }
 }
+
 
 type VoteDirection extends String{
     validate() { this == 'up' || this == 'down' }
@@ -94,7 +98,7 @@ path /posts {
     path /data {
         read() { isSignedIn() }
 
-        path /posts/{postId} is Timestamped<TextMessage> {
+        path /posts/{postId} is Timestamped<TextMessageWithLocation> {
             create() { isSignedIn()  && postIdOwned(postId,auth.uid)}
         }
 
