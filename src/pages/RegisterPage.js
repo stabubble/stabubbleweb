@@ -5,7 +5,7 @@ import {Button, Card, Input, Page, Toolbar} from "react-onsenui";
 function RegisterPage() {
     const history = useHistory();
 
-    if (!history.location.state.passphrase) {
+    if (!history?.location?.state?.passphrase) {
         history.replace('/');
     }
 

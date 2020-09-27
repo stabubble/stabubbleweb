@@ -77,7 +77,7 @@ path /users/{userId} {
     write() { isCurrentUser(userId) }
 }
 
-path /sessions/{userId} {
+path /sessions {
     read() { isCurrentUser(userId) }
     write() { isCurrentUser(userId) }
 }

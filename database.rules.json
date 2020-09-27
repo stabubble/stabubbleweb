@@ -1,8 +1,16 @@
 {
   "rules": {
-    ".read": "true",
-    ".write": "true",
     "users": {
+      "$userId": {
+        ".read": "(auth != null && auth.uid == $userId)",
+        ".write": "(auth != null && auth.uid == $userId)"
+      }
+    },
+    "sessions": {
+      ".read": "(auth != null && auth.uid == userId)",
+      ".write": "(auth != null && auth.uid == userId)"
+    },
+    "presence": {
       "$userId": {
         ".read": "(auth != null && auth.uid == $userId)",
         ".write": "(auth != null && auth.uid == $userId)"

@@ -8,8 +8,9 @@ admin.initializeApp();
 const crypto = require('crypto');
 const util = require('util');
 
-const niceware = require('niceware')
+const niceware = require('niceware');
 const userNameSalt = 'kLqzs2L4hfAcJpFt';
+const { v4: uuidv4 } = require('uuid');
 
 exports.register = functions.https.onCall(async (data, context) => {
     /*
@@ -57,11 +58,12 @@ exports.register = functions.https.onCall(async (data, context) => {
             const passphraseHashBuffer = await scrypt(words.slice(1).join(''), saltBuffer, 64);
             const passphraseHashString = passphraseHashBuffer.toString('hex');
 
-            const customToken = await admin.auth().createCustomToken(userId);
-            console.log(customToken)
+            const uid = uuidv4();
+            const customToken = await admin.auth().createCustomToken(uid);
 
             const authUserRef = admin.database().ref(`auth`).child(userId);
             await authUserRef.set({
+                uid: uid,
                 hash: passphraseHashString,
                 salt: saltString,
                 created: admin.database.ServerValue.TIMESTAMP
@@ -103,7 +105,7 @@ exports.login = functions.https.onCall(async (data, context) => {
                 Buffer.from(userObject.salt, 'hex'), 64);
             const compare = crypto.timingSafeEqual(Buffer.from(userObject.hash, 'hex'), passphraseHashBuffer);
             if (compare) {
-                const customToken = await admin.auth().createCustomToken(userId);
+                const customToken = await admin.auth().createCustomToken(userObject.uid);
                 return {
                     result: 'ok',
                     token: customToken

@@ -16,7 +16,8 @@
   "dependencies": {
     "firebase-admin": "^9.2.0",
     "firebase-functions": "^3.11.0",
-    "niceware": "^2.0.1"
+    "niceware": "^2.0.1",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
