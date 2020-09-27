@@ -84,7 +84,7 @@ function PostCard(props) {
                         icon={'fa-heart'}
                         fixedWidth={true}
                         style={{
-                            color: '#ff6961',
+                            color: props.voteDirection === 'up' ? '#ff7770' : '#ffc5c2',
                             position: 'relative',
                             textAlign: 'center'
                         }}
@@ -99,9 +99,9 @@ function PostCard(props) {
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
                             fontSize: 20,
-                            color: 'black',
+                            color: props.voteDirection === 'up' ? 'black' : 'gray',
                             fontFamily: 'san-serif',
-                            fontWeight: 'bold'
+                            fontWeight: 100
                         }}>
                             {[props.upVotes]}
                         </div>
@@ -126,7 +126,7 @@ function PostCard(props) {
                         icon={'fa-heart-broken'}
                         fixedWidth={true}
                         style={{
-                            color: '#aec6cf',
+                            color: props.voteDirection === 'down' ? '#a5c3ca' : '#d8e5e8',
                             position: 'relative',
                             textAlign: 'center'
                         }}
@@ -141,9 +141,9 @@ function PostCard(props) {
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
                             fontSize: 20,
-                            color: 'black',
+                            color: props.voteDirection === 'down' ? 'black' : 'gray',
                             fontFamily: 'san-serif',
-                            fontWeight: 'bold'
+                            fontWeight: 100
                         }}>
                             {props.downVotes}
                         </div>
@@ -152,6 +152,10 @@ function PostCard(props) {
                 <div style={{position: 'absolute', bottom: 20, color: 'gray', fontSize: 'small'}}>
                     <TimeAgo date={props.created}/>
                 </div>
+                {props.commentsLength >= 0 ?
+                    <div style={{position: 'absolute', bottom: 20, right: 20, color: 'gray', fontSize: 'small'}}>
+                        {props.commentsLength} replies
+                    </div> : null}
             </Card>
         </SwipeableListItem>
     )

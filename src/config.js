@@ -12,8 +12,8 @@ export const firebaseConfig = {
 
 export const reduxFirebase = {
     userProfile: 'users',
-    presence: 'presence',
-    sessions: 'sessions',
+    // presence: 'presence',
+    // sessions: 'sessions',
     useFirestoreForProfile: false,
     enableLogging: false
 }

@@ -7,7 +7,9 @@ import {
     List,
     ListItem,
     Page,
-    Segment, Tab,
+    Segment,
+    Select,
+    Tab,
     Tabbar,
     Toolbar,
     ToolbarButton
@@ -20,46 +22,53 @@ import {useFirebaseConnect, isLoaded, isEmpty, useFirebase} from 'react-redux-fi
 
 import {motion} from "framer-motion";
 
-function HomePage(props) {
-    const [activeSegment, setActiveSegment] = useState(0);
+import {locations, locationsAndWelcome} from "../constants";
+import {deletePost, togglePostVoteDown, togglePostVoteUp} from "../util/helpers";
 
-    const userId = Math.floor(Math.random() * 100);
+function HomePage(props) {
+    const firebase = useFirebase();
+    const user = useSelector((state) => state.firebase.auth) ?? {};
+    const userProfile = useSelector((state) => state.firebase.profile) ?? {};
+
+    const [activeSegment, setActiveSegment] = useState(0);
 
     useFirebaseConnect([
         {
-            path: `/posts/owner/${userId}`
+            path: `/posts/owner/${user.uid}`
         },
         {
-            path: '/posts/data',
+            path: '/posts/data/posts',
+            queryParams: ['orderByChild=location', `equalTo=${userProfile.location}`, "limitToLast=200"]
         },
-    ]);
+    ], [user]);
 
     const posts = useSelector((state) => state.firebase.data?.posts?.data?.posts) ?? {};
+    useFirebaseConnect(Object.keys(posts).map(postId =>
+        ({
+            path: `/posts/data/votes/${postId}`,
+        }, {
+            path: `/comments/data/comments/${postId}`,
+        })
+    ), [posts]);
     const votes = useSelector((state) => state.firebase.data?.posts?.data?.votes) ?? {};
-    const userPosts = useSelector((state) => state.firebase.data?.posts?.owner?.[userId]) ?? {};
+    const comments = useSelector((state) => state.firebase.data?.comments?.data?.comments) ?? {};
 
-    const firebase = useFirebase();
+    const userPosts = useSelector((state) => state.firebase.data?.posts?.owner?.[user.uid]) ?? {};
 
-    const votePostUp = (postId) => {
-        firebase.update('posts', {
-            [`owner/${userId}/votes/${postId}`]: 'up',
-            [`data/votes/${postId}/up`]: firebase.database.ServerValue.increment(1)
-        });
+    const votePostUp = async (postId) => {
+        await togglePostVoteUp(firebase, user, userPosts, postId);
     }
 
-    const votePostDown = (postId) => {
-        firebase.update('posts', {
-            [`owner/${userId}/votes/${postId}`]: 'down',
-            [`data/votes/${postId}/down`]: firebase.database.ServerValue.increment(1)
-        });
+    const votePostDown = async (postId) => {
+        await togglePostVoteDown(firebase, user, userPosts, postId);
     }
 
-    const deletePost = (postId) => {
-        firebase.update('posts', {
-            [`owner/${userId}/posts/${postId}`]: null,
-            [`data/posts/${postId}`]: null,
-            [`data/votes/${postId}`]: null
-        });
+    const doDeletePost = async (postId) => {
+        await deletePost(firebase, user, postId);
+    }
+
+    const updateLocation = (event) => {
+        firebase.updateProfile({location: event.target.value});
     }
 
     return (
@@ -77,56 +86,68 @@ function HomePage(props) {
                 </Toolbar>
             }
             contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
-            <SwipeableList
-                scrollStartThreshold={10}
-                swipeStartThreshold={10}
-                threshold={0.2}
-            >
-                <List>
-                    {Object.entries(posts)
-                        .map(([key, value]) => [key,
-                            {
-                                ...value,
-                                upVotes: votes?.[key]?.up ?? 0,
-                                downVotes: votes?.[key]?.down ?? 0,
-                                voteDirection: userPosts?.votes?.[key] ?? '',
-                                owner: userPosts?.posts?.[key] ?? false
-                            }])
-                        .sort(([key1, value1], [key2, value2]) => {
-                            let aValue = 0;
-                            let bValue = 0;
-                            if (activeSegment === 0) {
-                                aValue = parseInt(value1.created);
-                                bValue = parseInt(value2.created);
-                            } else {
-                                aValue = parseInt(value1.upVotes) - parseInt(value1.downVotes);
-                                bValue = parseInt(value2.upVotes) - parseInt(value2.downVotes);
-                            }
-                            if (aValue > bValue) {
-                                return -1;
-                            }
-                            if (aValue < bValue) {
-                                return 1;
-                            }
-                            return 0;
-                        })
-                        .map(([key, value]) => <motion.div key={key} layout>
-                                <PostCard
-                                    id={key}
-                                    content={value.content}
-                                    upVotes={value.upVotes}
-                                    downVotes={value.downVotes}
-                                    created={value.created}
-                                    canDelete={value.owner}
-                                    voteDirection={value.voteDirection}
-                                    votePostUp={votePostUp}
-                                    votePostDown={votePostDown}
-                                    deletePost={deletePost}
-                                />
-                            </motion.div>
-                        )}
-                </List>
-            </SwipeableList>
+            <div>
+                <Select value={userProfile?.location}
+                        onChange={updateLocation}
+                        style={{paddingLeft: 15, paddingTop: 5}}>
+                    {userProfile?.location === 'welcome' ?
+                        locationsAndWelcome.map(loc => <option key={loc.id}
+                                                               value={loc.id}>{loc.name}</option>) :
+                        locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
+                </Select>
+                <SwipeableList
+                    scrollStartThreshold={10}
+                    swipeStartThreshold={10}
+                    threshold={0.2}
+                >
+                    <List>
+                        {Object.entries(posts)
+                            .map(([key, value]) => [key,
+                                {
+                                    ...value,
+                                    upVotes: votes?.[key]?.up ?? 0,
+                                    downVotes: votes?.[key]?.down ?? 0,
+                                    voteDirection: userPosts?.votes?.[key] ?? '',
+                                    owner: userPosts?.posts?.[key] ?? false,
+                                    commentsLength: (Object.keys(comments?.[key] ?? {})).length
+                                }])
+                            .sort(([key1, value1], [key2, value2]) => {
+                                let aValue = 0;
+                                let bValue = 0;
+                                if (activeSegment === 0) {
+                                    aValue = parseInt(value1.created);
+                                    bValue = parseInt(value2.created);
+                                } else {
+                                    aValue = parseInt(value1.upVotes) - parseInt(value1.downVotes);
+                                    bValue = parseInt(value2.upVotes) - parseInt(value2.downVotes);
+                                }
+                                if (aValue > bValue) {
+                                    return -1;
+                                }
+                                if (aValue < bValue) {
+                                    return 1;
+                                }
+                                return 0;
+                            })
+                            .map(([key, value]) => <motion.div key={key} layout>
+                                    <PostCard
+                                        id={key}
+                                        content={value.content}
+                                        upVotes={value.upVotes}
+                                        downVotes={value.downVotes}
+                                        created={value.created}
+                                        canDelete={value.owner}
+                                        voteDirection={value.voteDirection}
+                                        votePostUp={votePostUp}
+                                        votePostDown={votePostDown}
+                                        deletePost={doDeletePost}
+                                        commentsLength={value.commentsLength}
+                                    />
+                                </motion.div>
+                            )}
+                    </List>
+                </SwipeableList>
+            </div>
         </Page>
     );
 }

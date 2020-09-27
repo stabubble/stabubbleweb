@@ -4,6 +4,8 @@ import PostCard from "../components/PostCard";
 import NewText from "../components/NewText";
 import {useHistory, useParams} from 'react-router-dom';
 import {useFirebase} from "react-redux-firebase";
+import {useSelector} from "react-redux";
+import {makeTextComment} from "../util/helpers";
 
 function ComponentTypeSwitcher(props) {
     switch (props.type) {
@@ -16,28 +18,16 @@ function NewCommentPage(props) {
     const history = useHistory();
     const {postId, type} = useParams();
 
-    const [data, setData] = useState('');
-
     const firebase = useFirebase();
+    const user = useSelector((state) => state.firebase.auth) ?? {};
+    const userProfile = useSelector((state) => state.firebase.profile) ?? {};
 
-    const userId = Math.floor(Math.random() * 100);
+    const [data, setData] = useState('');
 
     const addComment = async () => {
         switch (type) {
             case 'text':
-                const newCommentRef = await firebase.push(`comments/owner/${userId}/comments/${postId}`, true);
-                await firebase.update(`comments`, {
-                    [`data/comments/${postId}/${newCommentRef.key}`]: {
-                        type: 'text',
-                        content: data,
-                        created: firebase.database.ServerValue.TIMESTAMP,
-                        modified: firebase.database.ServerValue.TIMESTAMP
-                    },
-                    [`data/votes/${postId}/${newCommentRef.key}`]: {
-                        up: 0,
-                        down: 0
-                    }
-                });
+                await makeTextComment(firebase, user, postId, data);
                 break;
         }
     }

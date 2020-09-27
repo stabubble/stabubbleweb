@@ -4,6 +4,8 @@ import PostCard from "../components/PostCard";
 import NewText from "../components/NewText";
 import {useHistory, useParams} from 'react-router-dom';
 import {useFirebase} from "react-redux-firebase";
+import {useSelector} from "react-redux";
+import {makeTextPost} from "../util/helpers";
 
 function ComponentTypeSwitcher(props) {
     switch (props.type) {
@@ -16,29 +18,16 @@ function NewPostPage(props) {
     const history = useHistory();
     const {type} = useParams();
 
-    const [data, setData] = useState('');
-
     const firebase = useFirebase();
+    const user = useSelector((state) => state.firebase.auth) ?? {};
+    const userProfile = useSelector((state) => state.firebase.profile) ?? {};
 
-    const userId = Math.floor(Math.random() * 100);
+    const [data, setData] = useState('');
 
     const addPost = async () => {
         switch (type) {
             case 'text':
-                const newPostRef = await firebase.push(`posts/owner/${userId}/posts`, true);
-                await firebase.update(`posts`, {
-                    [`data/posts/${newPostRef.key}`]: {
-                        type: 'text',
-                        content: data,
-                        location: 'test',
-                        created: firebase.database.ServerValue.TIMESTAMP,
-                        modified: firebase.database.ServerValue.TIMESTAMP
-                    },
-                    [`data/votes/${newPostRef.key}`]: {
-                        up: 0,
-                        down: 0
-                    },
-                });
+                await makeTextPost(firebase, user, userProfile, data);
                 break;
         }
     }

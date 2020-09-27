@@ -12,7 +12,8 @@ function WelcomePage(props) {
                 </div>
             </Toolbar>}
               contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column',
+                paddingLeft: 5, paddingRight: 5}}>
                 <div style={{paddingTop: 30}}>
                     <img alt="logo"
                          style={{width: '50%', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}/>

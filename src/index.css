@@ -1,3 +1,17 @@
+html, body {
+  position: fixed;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

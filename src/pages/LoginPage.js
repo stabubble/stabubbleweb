@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {AlertDialog, Button, Card, Input, Page, ProgressCircular, Toolbar} from "react-onsenui";
+import {AlertDialog, BackButton, Button, Card, Input, Page, ProgressCircular, Toolbar} from "react-onsenui";
 import {useFirebase} from "react-redux-firebase";
 
 function LoginPage(props) {
@@ -17,10 +17,10 @@ function LoginPage(props) {
         setLoggingIn(true);
         const login = firebase.functions().httpsCallable('login');
         try {
-            const loginResult = await login({passphrase});
+            const loginResult = await login({passphrase: passphrase.trim().toLowerCase()});
 
             if (loginResult?.data?.result === 'ok') {
-                firebase.login({
+                await firebase.login({
                     token: loginResult.data.token
                 });
                 history.push('/');
@@ -40,19 +40,27 @@ function LoginPage(props) {
     return (
         <Page renderToolbar={() =>
             <Toolbar>
-                <div className="center" style={{textAlign: 'center'}}>
+                <div className="left">
+                    <BackButton onClick={() => history.goBack()}>
+                        back
+                    </BackButton>
+                </div>
+                <div className="center">
                     enter the bubble
                 </div>
             </Toolbar>}
               contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+            <div style={{
+                display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column',
+                paddingLeft: 5, paddingRight: 5
+            }}>
                 <Input
                     value={passphrase} float
                     onChange={(event) => {
                         setPassphrase(event.target.value)
                     }}
                     placeholder='enter your passphrase here'
-                    style={{width: '100%', paddingTop: 10}}/>
+                    style={{width: '95%', marginTop: 15}}/>
                 {isLoggingIn ?
                     <ProgressCircular indeterminate/> :
                     <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}

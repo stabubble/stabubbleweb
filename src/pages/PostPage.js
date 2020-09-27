@@ -6,25 +6,35 @@ import {useHistory, useParams} from 'react-router-dom';
 import {useFirebase, useFirebaseConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
+import {
+    deleteComment,
+    deletePost,
+    toggleCommentVoteDown,
+    toggleCommentVoteUp,
+    togglePostVoteDown,
+    togglePostVoteUp
+} from "../util/helpers";
 
 function PostPage(props) {
     const history = useHistory();
     const {postId} = useParams();
 
-    const userId = Math.floor(Math.random() * 100);
+    const firebase = useFirebase();
+    const user = useSelector((state) => state.firebase.auth) ?? {};
+    const userProfile = useSelector((state) => state.firebase.profile) ?? {};
 
     useFirebaseConnect([
         {
-            path: `/posts/owner/${userId}`
+            path: `/posts/owner/${user.uid}`
         },
         {
-            path: `/posts/data/posts/${postId}`,
+            path: `/posts/data/posts/${user.uid}`,
         },
         {
-            path: `/posts/data/votes/${postId}`,
+            path: `/posts/data/votes/${user.uid}`,
         },
         {
-            path: `/comments/owner/${userId}`,
+            path: `/comments/owner/${user.uid}`,
         },
         {
             path: `/comments/data/comments/${postId}`,
@@ -32,60 +42,38 @@ function PostPage(props) {
         {
             path: `/comments/data/votes/${postId}`,
         },
-    ]);
+    ], [postId, user]);
 
     const post = useSelector((state) => state.firebase.data?.posts?.data?.posts?.[postId]) ?? undefined;
     const vote = useSelector((state) => state.firebase.data?.posts?.data?.votes?.[postId]) ?? {};
-    const userPosts = useSelector((state) => state.firebase.data?.posts?.owner?.[userId]) ?? {};
+    const userPosts = useSelector((state) => state.firebase.data?.posts?.owner?.[user.uid]) ?? {};
 
     const comments = useSelector((state) => state.firebase.data?.comments?.data?.comments?.[postId]) ?? {};
     const commentsVotes = useSelector((state) => state.firebase.data?.comments?.data?.votes?.[postId]) ?? {};
-    const userComments = useSelector((state) => state.firebase.data?.comments?.owner?.[userId]) ?? {};
+    const userComments = useSelector((state) => state.firebase.data?.comments?.owner?.[user.uid]) ?? {};
 
-    const firebase = useFirebase();
-
-    const votePostUp = (postId) => {
-        firebase.update('posts', {
-            [`owner/${userId}/votes/${postId}`]: 'up',
-            [`data/votes/${postId}/up`]: firebase.database.ServerValue.increment(1)
-        });
+    const votePostUp = async (postId) => {
+        await togglePostVoteUp(firebase, user, userPosts, postId);
     }
 
-    const votePostDown = (postId) => {
-        firebase.update('posts', {
-            [`owner/${userId}/votes/${postId}`]: 'down',
-            [`data/votes/${postId}/down`]: firebase.database.ServerValue.increment(1)
-        });
+    const votePostDown = async (postId) => {
+        await togglePostVoteDown(firebase, user, userPosts, postId);
     }
 
-    const deletePost = (postId) => {
-        firebase.update('posts', {
-            [`owner/${userId}/posts/${postId}`]: null,
-            [`data/posts/${postId}`]: null,
-            [`data/votes/${postId}`]: null
-        });
+    const doDeletePost = async (postId) => {
+        await deletePost(firebase, user, postId);
     }
 
-    const voteCommentUp = (commentId) => {
-        firebase.update('comments', {
-            [`owner/${userId}/votes/${postId}/${commentId}`]: 'up',
-            [`data/votes/${postId}/${commentId}/up`]: firebase.database.ServerValue.increment(1)
-        });
+    const voteCommentUp = async (commentId) => {
+        await toggleCommentVoteUp(firebase, user, userComments, postId, commentId);
     }
 
-    const voteCommentDown = (commentId) => {
-        firebase.update('comments', {
-            [`owner/${userId}/votes/${postId}/${commentId}`]: 'down',
-            [`data/votes/${postId}/${commentId}/down`]: firebase.database.ServerValue.increment(1)
-        });
+    const voteCommentDown = async (commentId) => {
+        await toggleCommentVoteDown(firebase, user, userComments, postId, commentId);
     }
 
-    const deleteComment = (commentId) => {
-        firebase.update('comments', {
-            [`owner/${userId}/comments/${postId}/${commentId}`]: null,
-            [`data/comments/${postId}/${commentId}`]: null,
-            [`data/votes/${postId}/${commentId}`]: null
-        });
+    const doDeleteComment = async (commentId) => {
+        await deleteComment(firebase, user, postId, commentId);
     }
 
     return (
@@ -123,7 +111,8 @@ function PostPage(props) {
                     voteDirection={userPosts?.votes?.[postId] ?? ''}
                     votePostUp={votePostUp}
                     votePostDown={votePostDown}
-                    deletePost={deletePost}
+                    deletePost={doDeletePost}
+                    commentsLength={(Object.keys(comments) ?? {}).length}
                 />
                 <hr style={{margin: 0, borderColor: '#cfcfc4', borderWidth: 2, borderStyle: 'solid'}}/>
                 <SwipeableList
@@ -165,7 +154,7 @@ function PostPage(props) {
                                         voteDirection={value.voteDirection}
                                         votePostUp={voteCommentUp}
                                         votePostDown={voteCommentDown}
-                                        deletePost={deleteComment}
+                                        deletePost={doDeleteComment}
                                     />
                                 </motion.div>
                             )}

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Button, Card, Input, Page, Toolbar, ProgressCircular, AlertDialog} from "react-onsenui";
+import {Button, Card, Input, Page, Toolbar, ProgressCircular, AlertDialog, BackButton} from "react-onsenui";
 import {useFirebase} from "react-redux-firebase";
 
 function TokenPage(props) {
@@ -17,13 +17,14 @@ function TokenPage(props) {
         setRegistering(true);
         const register = firebase.functions().httpsCallable('register');
         try {
-            const registerResult = await register({token});
+            const registerResult = await register({token: token.trim().toLowerCase()});
 
             if (registerResult?.data?.result === 'ok') {
-                firebase.login({
+                await firebase.login({
                     token: registerResult.data.token
                 });
                 history.push('/register', {passphrase: registerResult.data.passphrase});
+                await firebase.updateProfile({location: 'welcome'});
             } else {
                 setDisplayError(true);
                 setErrorMessage({title: 'token invalid', message: 'try again or try with different token'});
@@ -39,26 +40,32 @@ function TokenPage(props) {
     return (
         <Page renderToolbar={() =>
             <Toolbar>
-                <div className="center" style={{textAlign: 'center'}}>
+                <div className="left">
+                    <BackButton onClick={() => history.goBack()}>
+                        back
+                    </BackButton>
+                </div>
+                <div className="center">
                     join the bubble
                 </div>
             </Toolbar>}
               contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+            <div style={{
+                display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column',
+                paddingLeft: 5, paddingRight: 5
+            }}>
                 <Input
                     value={token} float
                     onChange={(event) => {
                         setToken(event.target.value)
                     }}
                     placeholder='enter your invite token here'
-                    style={{width: '100%', paddingTop: 10}}/>
-
+                    style={{width: '95%', marginTop: 15}}/>
                 {isRegistering ?
                     <ProgressCircular indeterminate/> :
                     <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
                             onClick={doRegister}>join!</Button>
                 }
-
             </div>
             <AlertDialog isOpen={displayError} onCancel={() => setDisplayError(false)} cancelable>
                 <div className="alert-dialog-title">{errorMessage.title}</div>

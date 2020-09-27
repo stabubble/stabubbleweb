@@ -1,10 +1,3 @@
-//==== dev rules
-//path / {
-//    read() { true }
-//    write() { true }
-//}
-//====
-
 //===https://github.com/FirebaseExtended/bolt/blob/master/docs/guide.md
 type Timestamped<T> extends T {
     modified: CurrentTimestamp,
@@ -76,7 +69,6 @@ path /users/{userId} {
     read() { isCurrentUser(userId) }
     write() { isCurrentUser(userId) }
 }
-
 
 path /posts {
 

@@ -13,12 +13,15 @@ function AgreePage(props) {
                         back
                     </BackButton>
                 </div>
-                <div className="center" style={{textAlign: 'center'}}>
+                <div className="center">
                     some things first...
                 </div>
             </Toolbar>}
               contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+            <div style={{
+                display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column',
+                paddingLeft: 5, paddingRight: 5
+            }}>
                 <div style={{paddingTop: 10, width: '100%'}}>
                     <Card>please be nice to everyone 😊</Card>
                     <Card>respect opinions of others</Card>
@@ -34,7 +37,8 @@ function AgreePage(props) {
                     <Card>like or dislike bubbles by swiping right or left</Card>
                     <Card>reply to bubbles to leave comments</Card>
                 </div>
-                <Button modifier="large" style={{marginTop: 10, marginBottom: 10}} onClick={() => history.push('/token')}>
+                <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
+                        onClick={() => history.push('/token')}>
                     ok!
                 </Button>
             </div>

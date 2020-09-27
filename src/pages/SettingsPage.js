@@ -16,7 +16,7 @@ function SettingsPage(props) {
                     settings
                 </div>
             </Toolbar>}
-              contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
+              contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto', paddingLeft: 5, paddingRight: 5}}>
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
                 <div style={{paddingTop: 30}}>
                     <img alt="logo"
@@ -29,12 +29,13 @@ function SettingsPage(props) {
                         onClick={() => history.push('/welcome')}>
                     leave the bubble
                 </Button>
-                <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}>
-                    pack the bubble (download data)
+                <Button modifier="large" disabled={true} style={{marginTop: 10, marginBottom: 10}}>
+                    pack the bubble (download data) (coming soon)
                 </Button>
-                <Button modifier="large" style={{marginTop: 10, marginBottom: 10, backgroundColor: '#ff3b30'}}
+                <Button modifier="large" disabled={true}
+                        style={{marginTop: 10, marginBottom: 10, backgroundColor: '#ff3b30'}}
                         onClick={() => history.push('/welcome')}>
-                    pop the bubble (delete account)
+                    pop the bubble (delete account) (coming soon)
                 </Button>
             </div>
         </Page>
