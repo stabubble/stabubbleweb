@@ -63,8 +63,7 @@ type TextMessage {
     validate() { this.type == 'text' }
 }
 
-
-type VoteDirection extends String{
+type VoteDirection extends String {
     validate() { this == 'up' || this == 'down' }
 }
 
@@ -74,6 +73,16 @@ type Vote {
 }
 
 path /users/{userId} {
+    read() { isCurrentUser(userId) }
+    write() { isCurrentUser(userId) }
+}
+
+path /sessions/{userId} {
+    read() { isCurrentUser(userId) }
+    write() { isCurrentUser(userId) }
+}
+
+path /presence/{userId} {
     read() { isCurrentUser(userId) }
     write() { isCurrentUser(userId) }
 }

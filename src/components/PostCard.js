@@ -1,0 +1,160 @@
+import React, {useState} from 'react';
+import {
+    BackButton,
+    Button,
+    Card,
+    Icon,
+    List,
+    ListItem,
+    Page,
+    Segment, Tab,
+    Tabbar,
+    Toolbar,
+    ToolbarButton
+} from "react-onsenui";
+import {SwipeableList, SwipeableListItem} from '@sandstreamdev/react-swipeable-list';
+import {useHistory} from 'react-router-dom';
+import TimeAgo from 'react-timeago';
+
+function PostCard(props) {
+    const [isSwiping, setIsSwiping] = useState(false);
+    const [swipeProgress, setSwipeProgress] = useState(0);
+    const history = useHistory();
+    return (
+        <SwipeableListItem
+            threshold={0.1}
+            swipeLeft={
+                props.canDelete ?
+                    {
+                        content: <div>
+                            <Icon
+                                size={40}
+                                icon={'fa-trash'}
+                                fixedWidth={true}
+                                style={{paddingRight: 20}}
+                            />
+                        </div>,
+                        action: () => props.deletePost(props.id)
+                    }
+                    :
+                    {
+                        content: <div>
+                            <Icon
+                                size={40}
+                                icon={'fa-heart-broken'}
+                                fixedWidth={true}
+                                style={{paddingRight: 20, color: '#aec6cf'}}
+                            />
+                        </div>,
+                        action: () => props.votePostDown(props.id)
+                    }
+            }
+            swipeRight={props.canDelete ?
+                null
+                :
+                {
+                    content: <div>
+
+                        <Icon
+                            size={40}
+                            icon={'fa-heart'}
+                            fixedWidth={true}
+                            style={{paddingLeft: 20, color: '#ff6961'}}
+                        />
+                    </div>,
+                    action: () => props.votePostUp(props.id)
+                }
+            }
+            onSwipeStart={() => {
+                setIsSwiping(true);
+                setSwipeProgress(0)
+            }}
+            onSwipeEnd={() => {
+                if (swipeProgress === 0) setIsSwiping(false)
+            }}
+            onSwipeProgress={progress => setSwipeProgress(progress)}
+        >
+            <Card style={{
+                width: '100%', display: 'grid',
+                gridTemplateColumns: 'minmax(0px, max-content) minmax(0, 1fr) minmax(0px, max-content)'
+            }}>
+                <div style={{gridRow: '1/1', justifySelf: 'start'}}>
+                    <Icon
+                        size={40}
+                        icon={'fa-heart'}
+                        fixedWidth={true}
+                        style={{
+                            color: '#ff6961',
+                            position: 'relative',
+                            textAlign: 'center'
+                        }}
+                        onClick={() => {
+                            if (!isSwiping) {
+                                props.votePostUp(props.id);
+                            }
+                        }}>
+                        <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            fontSize: 20,
+                            color: 'black',
+                            fontFamily: 'san-serif',
+                            fontWeight: 'bold'
+                        }}>
+                            {[props.upVotes]}
+                        </div>
+                    </Icon>
+                </div>
+                <div style={{
+                    gridRow: '1/1', overflowWrap: 'break-word', hyphens: 'auto',
+                    paddingLeft: 40, paddingRight: 40, paddingBottom: 40
+                }}
+                     onClick={() => {
+                         if (props.id && !isSwiping) {
+                             history.push('/post/' + props.id)
+                         } else {
+                             setIsSwiping(false);
+                         }
+                     }}>
+                    {props.content}
+                </div>
+                <div style={{gridRow: '1/1', justifySelf: 'end'}}>
+                    <Icon
+                        size={40}
+                        icon={'fa-heart-broken'}
+                        fixedWidth={true}
+                        style={{
+                            color: '#aec6cf',
+                            position: 'relative',
+                            textAlign: 'center'
+                        }}
+                        onClick={() => {
+                            if (!isSwiping) {
+                                props.votePostDown(props.id);
+                            }
+                        }}>
+                        <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            fontSize: 20,
+                            color: 'black',
+                            fontFamily: 'san-serif',
+                            fontWeight: 'bold'
+                        }}>
+                            {props.downVotes}
+                        </div>
+                    </Icon>
+                </div>
+                <div style={{position: 'absolute', bottom: 20, color: 'gray', fontSize: 'small'}}>
+                    <TimeAgo date={props.created}/>
+                </div>
+            </Card>
+        </SwipeableListItem>
+    )
+}
+
+export default PostCard;
