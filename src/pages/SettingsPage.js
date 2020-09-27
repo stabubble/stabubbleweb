@@ -1,28 +1,65 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {BackButton, Button, Page, Toolbar} from "react-onsenui";
+import {AlertDialog, BackButton, Button, Page, Toolbar} from "react-onsenui";
 import {useFirebase} from "react-redux-firebase";
 import logo from '../images/logo512.png';
+
+import {version} from "../constants";
 
 function SettingsPage(props) {
     const history = useHistory();
     const firebase = useFirebase();
 
-    const logout = async () => {
-        await firebase.logout();
-        history.push('/welcome');
+    const [displayWarning, setDisplayWarning] = useState(false);
+    const [warningMessage, setWarningMessage] = useState({title: '', message: ''});
+    const [warningAction, setWarningAction] = useState(null);
+
+    const logoutWarn = () => {
+        setWarningMessage({
+            title: 'you really want to leave the bubble?',
+            message: 'use your passphrase to login again!'
+        });
+        setWarningAction('logout');
+        setDisplayWarning(true);
     }
 
-    const logoutMultiple = async () => {
-        const logoutAll = firebase.functions().httpsCallable('logoutAll');
-        await logoutAll();
-        await logout();
+    const logoutAllWarn = () => {
+        setWarningMessage({
+            title: 'you really want to leave the bubble everywhere?',
+            message: 'use your passphrase to login again!'
+        });
+        setWarningAction('logoutAll');
+        setDisplayWarning(true);
     }
 
-    const deleteAccount = async () => {
-        const deleteUser = firebase.functions().httpsCallable('deleteUser');
-        await deleteUser();
-        await logout();
+    const deleteAccountWarn = () => {
+        setWarningMessage({
+            title: 'you really want to pop your bubbles?',
+            message: 'all your data will be deleted!'
+        });
+        setWarningAction('deleteAccount');
+        setDisplayWarning(true);
+    }
+
+    const doAction = async () => {
+        switch (warningAction) {
+            case 'logout':
+                await firebase.logout();
+                history.push('/welcome');
+                break;
+            case 'logoutAll':
+                const logoutAll = firebase.functions().httpsCallable('logoutAll');
+                await logoutAll();
+                setWarningAction('logout');
+                await doAction();
+                break;
+            case 'deleteAccount':
+                const deleteUser = firebase.functions().httpsCallable('deleteUser');
+                await deleteUser();
+                setWarningAction('logout');
+                await doAction();
+                break;
+        }
     }
 
     return (
@@ -45,23 +82,38 @@ function SettingsPage(props) {
                 </div>
                 <div style={{paddingLeft: 10, paddingRight: 10, textAlign: 'center'}}>
                     <h1>st andrews anonymous chat</h1>
+                    <div style={{color: 'gray'}}>version: {version}</div>
                 </div>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
-                        onClick={logout}>
+                        onClick={logoutWarn}>
                     leave the bubble
                 </Button>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
-                        onClick={logoutMultiple}>
+                        onClick={logoutAllWarn}>
                     leave the bubble (all devices)
                 </Button>
                 <Button modifier="large" disabled={true} style={{marginTop: 10, marginBottom: 10}}>
-                    pack the bubble (download data) (coming soon)
+                    pack your bubbles (download data) (coming soon)
                 </Button>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10, backgroundColor: '#ff3b30'}}
-                        onClick={deleteAccount}>
-                    pop the bubble (delete account)
+                        onClick={deleteAccountWarn}>
+                    pop your bubbles (delete account)
                 </Button>
             </div>
+            <AlertDialog isOpen={displayWarning} onCancel={() => setDisplayWarning(false)} cancelable>
+                <div className="alert-dialog-title">{warningMessage.title}</div>
+                <div className="alert-dialog-content">
+                    {warningMessage.message}
+                </div>
+                <div className="alert-dialog-footer">
+                    <Button onClick={doAction} className="alert-dialog-button">
+                        ok
+                    </Button>
+                    <Button onClick={() => setDisplayWarning(false)} className="alert-dialog-button">
+                        cancel
+                    </Button>
+                </div>
+            </AlertDialog>
         </Page>
     )
 }

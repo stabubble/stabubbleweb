@@ -15,3 +15,5 @@ export const locationsAndWelcome = [
     {id: 'welcome', name: 'welcome space'},
     ...locations
 ]
+
+export const version = '0.1 beta';
