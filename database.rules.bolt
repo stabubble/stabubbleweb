@@ -32,20 +32,20 @@ votedAtSameTimeAndNotVoted(postId,dir){
 removedVoteAtSameTimeAndHasVoted(postId,dir){
     ((root.posts.data.votes[postId].up-prior(root.posts.data.votes[postId].up)==-1&&dir=='up')||
     (root.posts.data.votes[postId].down-prior(root.posts.data.votes[postId].down)==-1&&dir=='down'))}
-postIdOwned(postId,userId){
-    postId!=null&&root.posts.owner[userId].posts[postId]!=null}
-commentDoesNotExist(postId,commentId){prior(root.comments.posts[postId][commentId])==null}
-commentDeletedAtSameTime(postId,commentId){root.comments.posts[postId][commentId]==null}
+postIdOwned(postId){
+    postId!=null&&root.posts.owner[auth.uid].posts[postId]!=null}
+commentDoesNotExist(postId,commentId){prior(root.comments.data.comments[postId][commentId])==null}
+commentDeletedAtSameTime(postId,commentId){root.comments.data.comments[postId][commentId]==null}
 
 commentVotedAtSameTimeAndNotVoted(postId,commentId,dir){
-    ((root.comments.data.votes[postId][commentId].up-prior(root.posts.data.votes[postId][commentId].up)==1&&dir=='up')||
-    (root.comments.data.votes[postId][commentId].down-prior(root.posts.data.votes[postId][commentId].down)==1&&dir=='down'))}
+    ((root.comments.data.votes[postId][commentId].up-prior(root.comments.data.votes[postId][commentId].up)==1&&dir=='up')||
+    (root.comments.data.votes[postId][commentId].down-prior(root.comments.data.votes[postId][commentId].down)==1&&dir=='down'))}
 commentRemovedVoteAtSameTimeAndHasVoted(postId,commentId,dir){
-    ((root.comments.data.votes[postId][commentId].up-prior(root.posts.data.votes[postId][commentId].up)==-1&&dir=='up')||
-    (root.comments.data.votes[postId][commentId].down-prior(root.posts.data.votes[postId][commentId].down)==-1&&dir=='down'))}
+    ((root.comments.data.votes[postId][commentId].up-prior(root.comments.data.votes[postId][commentId].up)==-1&&dir=='up')||
+    (root.comments.data.votes[postId][commentId].down-prior(root.comments.data.votes[postId][commentId].down)==-1&&dir=='down'))}
 
-commentIdOwned(postId,commentId,userId){
-    postId!=null&&commentId!=null&&root.comments.owner[userId][postId][commentId]!=null}
+commentIdOwned(postId,commentId){
+    postId!=null&&commentId!=null&&root.comments.owner[auth.uid].comments[postId][commentId]!=null}
 //===
 
 type TextMessageWithLocation extends TextMessage {
@@ -99,7 +99,7 @@ path /posts {
         read() { isSignedIn() }
 
         path /posts/{postId} is Timestamped<TextMessageWithLocation> {
-            create() { isSignedIn()  && postIdOwned(postId,auth.uid)}
+            create() { isSignedIn()  && postIdOwned(postId)}
         }
 
         path /votes/{postId} is Vote {
@@ -122,8 +122,8 @@ path /comments {
             }
 
             path /votes/{postId}/{commentId} is VoteDirection {
-                create() { isCurrentUser(userId) && commentVotedAtSameTimeAndNotVoted(postId,comment,this) }
-                delete() { isCurrentUser(userId) && commentRemovedVoteAtSameTimeAndHasVoted(postId,comment,this) }
+                create() { isCurrentUser(userId) && commentVotedAtSameTimeAndNotVoted(postId,commentId,this) }
+                delete() { isCurrentUser(userId) && commentRemovedVoteAtSameTimeAndHasVoted(postId,commentId,this) }
             }
         }
     }
@@ -132,7 +132,7 @@ path /comments {
         read() { isSignedIn() }
 
         path /comments/{postId}/{commentId} is Timestamped<TextMessage> {
-            create() { isSignedIn()  && commentIdOwned(postId,commentId,auth.uid)}
+            create() { isSignedIn()  && commentIdOwned(postId,commentId)}
         }
 
         path /votes/{postId}/{commentId} is Vote {
