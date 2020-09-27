@@ -38,18 +38,20 @@ function HomePage(props) {
         },
         {
             path: '/posts/data/posts',
-            queryParams: ['orderByChild=location', `equalTo=${userProfile.location}`, "limitToLast=200"]
+            queryParams: ['orderByChild=location', `equalTo=${userProfile.location}`, "limitToLast=200"],
+            storeAs: 'filteredPosts'
         },
     ], [user]);
 
-    const posts = useSelector((state) => state.firebase.data?.posts?.data?.posts) ?? {};
-    useFirebaseConnect(Object.keys(posts).map(postId =>
-        ({
+    const posts = useSelector((state) => state.firebase.data?.filteredPosts) ?? {};
+    useFirebaseConnect(Object.keys(posts).flatMap(postId => [
+        {
             path: `/posts/data/votes/${postId}`,
         }, {
             path: `/comments/data/comments/${postId}`,
-        })
+        }]
     ), [posts]);
+
     const votes = useSelector((state) => state.firebase.data?.posts?.data?.votes) ?? {};
     const comments = useSelector((state) => state.firebase.data?.comments?.data?.comments) ?? {};
 

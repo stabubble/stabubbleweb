@@ -10,7 +10,7 @@ const util = require('util');
 
 const niceware = require('niceware');
 const userNameSalt = 'kLqzs2L4hfAcJpFt';
-const { v4: uuidv4 } = require('uuid');
+const {v4: uuidv4} = require('uuid');
 
 exports.register = functions.https.onCall(async (data, context) => {
     /*
@@ -119,3 +119,48 @@ exports.login = functions.https.onCall(async (data, context) => {
     };
 });
 
+exports.logoutAll = functions.https.onCall(async (data, context) => {
+    await admin.auth().revokeRefreshTokens(context.auth.uid);
+});
+
+exports.deleteUser = functions.https.onCall(async (data, context) => {
+    const uid = context.auth.uid;
+    await admin.auth().revokeRefreshTokens(uid);
+    await admin.auth().deleteUser(uid);
+    const authObject = await admin.database().ref('auth')
+        .orderByChild('uid')
+        .equalTo(uid)
+        .once('value');
+    const authIdObject = authObject.val() && Object.keys(authObject.val());
+    const authId = authIdObject && authIdObject.length && authIdObject[0];
+    await admin.database().ref('auth').child(authId).remove();
+    await admin.database().ref('users').child(uid).remove();
+    const postsOwnerRef = admin.database().ref('posts/owner').child(uid);
+    const postOwner = (await postsOwnerRef.once('value')).val();
+    if (postOwner && postOwner.posts) {
+        const posts = postOwner.posts;
+        Object.keys(posts).forEach(async (post) => {
+            await admin.database().ref('posts/data/posts').child(post).remove();
+            await admin.database().ref('posts/data/votes').child(post).remove();
+            await admin.database().ref('comments/data/comments').child(post).remove();
+            await admin.database().ref('comments/data/votes').child(post).remove();
+        });
+    }
+    await postsOwnerRef.remove();
+    const commentsOwnerRef = admin.database().ref('comments/owner').child(uid);
+    const commentsOwner = (await commentsOwnerRef.once('value')).val();
+    if (commentsOwner && commentsOwner.comments) {
+        const comments = commentsOwner.comments;
+        Object.keys(comments).forEach(async (postComment) => {
+            if (postComment) {
+                Object.keys(postComment).forEach(async (comment) => {
+                    await admin.database().ref('comments/data/comments')
+                        .child(postComment).child(comment).remove();
+                    await admin.database().ref('comments/data/votes')
+                        .child(postComment).child(comment).remove();
+                });
+            }
+        });
+    }
+    await commentsOwnerRef.remove();
+});
