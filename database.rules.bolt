@@ -24,28 +24,28 @@ initial(value, init) { value == (prior(value) == null ? init : prior(value)) }
 isCurrentUser(uid) { isSignedIn() && auth.uid == uid }
 isSignedIn() { auth != null }
 createOnly(value) { prior(value) == null && value != null }
-postDoesNotExist(postId) { postId != null && prior(root.posts.data.posts.$postId) == null}
-postDeletedAtSameTime(postId){ postId != null && root.posts.data.posts.$postId == null }
+postDoesNotExist(postId) { postId != null && prior(root.posts.data.posts[postId]) == null}
+postDeletedAtSameTime(postId){ postId != null && root.posts.data.posts[postId] == null }
 votedAtSameTimeAndNotVoted(postId,dir){
-    ((root.posts.data.votes.$postId.up-prior(root.posts.data.votes.$postId.up)==1&&dir=='up')||
-    (root.posts.data.votes.$postId.down-prior(root.posts.data.votes.$postId.down)==1&&dir=='down'))}
+    ((root.posts.data.votes[postId].up-prior(root.posts.data.votes[postId].up)==1&&dir=='up')||
+    (root.posts.data.votes[postId].down-prior(root.posts.data.votes[postId].down)==1&&dir=='down'))}
 removedVoteAtSameTimeAndHasVoted(postId,dir){
-    ((root.posts.data.votes.$postId.up-prior(root.posts.data.votes.$postId.up)==-1&&dir=='up')||
-    (root.posts.data.votes.$postId.down-prior(root.posts.data.votes.$postId.down)==-1&&dir=='down'))}
+    ((root.posts.data.votes[postId].up-prior(root.posts.data.votes[postId].up)==-1&&dir=='up')||
+    (root.posts.data.votes[postId].down-prior(root.posts.data.votes[postId].down)==-1&&dir=='down'))}
 postIdOwned(postId,userId){
-    postId!=null&&root.posts.owner.$userId.posts.$postId!=null}
-commentDoesNotExist(postId,commentId){prior(root.comments.posts.$postId.$commentId)==null}
-commentDeletedAtSameTime(postId,commentId){root.comments.posts.$postId.$commentId==null}
+    postId!=null&&root.posts.owner[userId].posts[postId]!=null}
+commentDoesNotExist(postId,commentId){prior(root.comments.posts[postId][commentId])==null}
+commentDeletedAtSameTime(postId,commentId){root.comments.posts[postId][commentId]==null}
 
 commentVotedAtSameTimeAndNotVoted(postId,commentId,dir){
-    ((root.comments.data.votes.$postId.$commentId.up-prior(root.posts.data.votes.$postId.$commentId.up)==1&&dir=='up')||
-    (root.comments.data.votes.$postId.$commentId.down-prior(root.posts.data.votes.$postId.$commentId.down)==1&&dir=='down'))}
+    ((root.comments.data.votes[postId][commentId].up-prior(root.posts.data.votes[postId][commentId].up)==1&&dir=='up')||
+    (root.comments.data.votes[postId][commentId].down-prior(root.posts.data.votes[postId][commentId].down)==1&&dir=='down'))}
 commentRemovedVoteAtSameTimeAndHasVoted(postId,commentId,dir){
-    ((root.comments.data.votes.$postId.$commentId.up-prior(root.posts.data.votes.$postId.$commentId.up)==-1&&dir=='up')||
-    (root.comments.data.votes.$postId.$commentId.down-prior(root.posts.data.votes.$postId.$commentIddown)==-1&&dir=='down'))}
+    ((root.comments.data.votes[postId][commentId].up-prior(root.posts.data.votes[postId][commentId].up)==-1&&dir=='up')||
+    (root.comments.data.votes[postId][commentId].down-prior(root.posts.data.votes[postId][commentId].down)==-1&&dir=='down'))}
 
 commentIdOwned(postId,commentId,userId){
-    postId!=null&&commentId!=null&&root.comments.owner.$userId.$postId.$commentId!=null}
+    postId!=null&&commentId!=null&&root.comments.owner[userId][postId][commentId]!=null}
 //===
 
 type TextMessageWithLocation extends TextMessage {
@@ -77,15 +77,6 @@ path /users/{userId} {
     write() { isCurrentUser(userId) }
 }
 
-path /sessions {
-    read() { isCurrentUser(userId) }
-    write() { isCurrentUser(userId) }
-}
-
-path /presence/{userId} {
-    read() { isCurrentUser(userId) }
-    write() { isCurrentUser(userId) }
-}
 
 path /posts {
 
