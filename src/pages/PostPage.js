@@ -28,10 +28,10 @@ function PostPage(props) {
             path: `/posts/owner/${user.uid}`
         },
         {
-            path: `/posts/data/posts/${user.uid}`,
+            path: `/posts/data/posts/${postId}`,
         },
         {
-            path: `/posts/data/votes/${user.uid}`,
+            path: `/posts/data/votes/${postId}`,
         },
         {
             path: `/comments/owner/${user.uid}`,
