@@ -95,5 +95,585 @@ describe("profile rules", () => {
             })
         );
     });
-});
 
+    it("should require users to have post token to update/create a post but not others", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+        await firebase.assertFails(
+
+            bob.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            noone.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+    });
+
+    it("should require users to have post token to update/create a post but not a random one", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+        await firebase.assertFails(
+
+            alice.ref(`posts`).update({
+                [`data/posts/random`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/random`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            bob.ref(`posts`).update({
+                [`data/posts/random`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/random`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            noone.ref(`posts`).update({
+                [`data/posts/random`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+    });
+
+    it("should let a user create a token they own but not to someone else", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        await firebase.assertSucceeds(
+            alice.ref('posts/owner/alice/posts').push(true)
+        );
+
+        await firebase.assertFails(
+            bob.ref('posts/owner/alice/posts').push(true)
+        );
+
+        await firebase.assertFails(
+            noone.ref('posts/owner/alice/posts').push(true)
+        );
+    });
+
+    it("should require users to have comment token to update/create a comment but not others", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+
+        const aliceCommentKey = await alice.ref(`comments/owner/alice/comments/${aliceKey.key}`).push(true);
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            bob.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            noone.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+    });
+
+    it("should require users to have comment token to update/create a comment but not a random one", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+
+        const aliceCommentKey = await alice.ref(`comments/owner/alice/comments/${aliceKey.key}`).push(true);
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            alice.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/random`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/random`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+
+        await firebase.assertFails(
+
+            bob.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/random`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/random`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+        await firebase.assertFails(
+
+            noone.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/random`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/random`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        );
+
+    });
+
+    it("should let a user create a comment token for themselves but not for someone else", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+
+        await firebase.assertSucceeds(
+            alice.ref(`comments/owner/alice/comments/${aliceKey.key}`).push(true)
+        );
+
+        await firebase.assertFails(
+            bob.ref(`comments/owner/alice/comments/${aliceKey.key}`).push(true)
+        );
+
+        await firebase.assertFails(
+            noone.ref(`comments/owner/alice/comments/${aliceKey.key}`).push(true)
+        );
+
+    });
+
+    it("should require users to have post token to delete a post but not others", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:null,
+                [`data/votes/${aliceKey.key}`]:null,
+                [`owner/alice/posts/${aliceKey.key}`]:null
+            })
+        );
+        await firebase.assertFails(
+
+            bob.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:null,
+                [`data/votes/${aliceKey.key}`]:null,
+                [`owner/alice/posts/${aliceKey.key}`]:null
+            })
+        );
+        await firebase.assertFails(
+
+            noone.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:null,
+                [`data/votes/${aliceKey.key}`]:null,
+                [`owner/alice/posts/${aliceKey.key}`]:null
+            })
+        );
+    });
+
+    it("should require users to have comment token to delete a comment but not others", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+
+        const aliceCommentKey = await alice.ref(`comments/owner/alice/comments/${aliceKey.key}`).push(true);
+        alice.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+                [`owner/alice/comments/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+            })
+        );
+
+        await firebase.assertFails(
+
+            bob.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+                [`owner/alice/comments/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+            })
+        );
+        await firebase.assertFails(
+
+            noone.ref(`comments`).update({
+                [`data/comments/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+                [`data/votes/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+                [`owner/alice/comments/${aliceKey.key}/${aliceCommentKey.key}`]:null,
+            })
+        );
+
+    });
+
+    it("should require users to use your slot to vote, but not someone else's", async() =>{
+
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        await firebase.assertSucceeds(
+            alice.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+        );
+        await firebase.assertFails(
+            bob.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+        );
+        await firebase.assertFails(
+            noone.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+        );
+    })
+    it("should require users to modify your slot to remove vote, but not someone else's", async() =>{
+
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+            alice.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+
+        await firebase.assertSucceeds(
+            alice.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: null,
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(-1)
+            })
+        );
+        await firebase.assertFails(
+            bob.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: null,
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(-1)
+            })
+        );
+        await firebase.assertFails(
+            noone.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: null,
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(-1)
+            })
+        );
+    })
+    it("should require users to use your slot to vote, but not more than once", async() =>{
+
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        await firebase.assertSucceeds(
+            alice.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+        );
+        await firebase.assertFails(
+            alice.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+        );
+        await firebase.assertFails(
+            alice.ref('posts').update( {
+                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
+            })
+        );
+    })
+
+});
