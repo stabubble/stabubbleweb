@@ -8,9 +8,38 @@ admin.initializeApp();
 const crypto = require('crypto');
 const util = require('util');
 
-const niceware = require('niceware');
+const diceware = require('diceware-generator');
+const dicewareWord = require('diceware-wordlist-en-eff');
 const userNameSalt = 'kLqzs2L4hfAcJpFt';
 const {v4: uuidv4} = require('uuid');
+const ipaddr = require('ipaddr.js');
+
+const staIp = ipaddr.parseCIDR('138.251.0.0/16');
+
+exports.generateToken = functions.https.onCall(async (data, context) => {
+    const uid = context.auth.uid;
+    const tokenRef = admin.database().ref('token');
+    const userTokenRef = tokenRef.child('users').child(uid);
+    const activeTokensRef = tokenRef.child('active');
+    const userToken = await userTokenRef.once('value');
+    if (userToken.exists()) {
+        if (userToken.created > (Date.now() - (24 * 60 * 60 * 1000))) {
+            return;
+        }
+    }
+    const dicewareOptions = {
+        language: dicewareWord,
+        wordcount: 2,
+        format: 'string'
+    }
+    const words = diceware(dicewareOptions);
+    await userTokenRef.set({
+        token: words,
+        created: admin.database.ServerValue.TIMESTAMP,
+        active: true
+    });
+    await activeTokensRef.child(words).set(admin.database.ServerValue.TIMESTAMP);
+});
 
 exports.register = functions.https.onCall(async (data, context) => {
     /*
@@ -24,16 +53,27 @@ exports.register = functions.https.onCall(async (data, context) => {
     8) Store user_id: { hash: , salt: }
     9) return login with user_id
      */
-    const token = data.token && data.token.toString().replace(/\W/g, '');
+    const token = data.token && data.token.toString().trim().replace(/\W/g, ' ');
     if (token) {
         const activeTokenRef = admin.database().ref(`token/active`).child(token);
-        //TODO check for expiry instead
-        const tokenExists = (await activeTokenRef.once('value')).exists();
-        if (tokenExists) {
+        const activeToken = await activeTokenRef.once('value');
+        const tokenExists = activeToken.exists();
+        const tokenValid = activeToken.val() > (Date.now() - (24 * 60 * 60 * 1000));
+        const util = require('util');
+        if ((tokenExists && tokenValid) ||
+            (token === 'staipaddr' &&
+                context.rawRequest.headers['x-appengine-user-ip'] &&
+                ipaddr.IPv4.isValid(context.rawRequest.headers['x-appengine-user-ip']) &&
+                ipaddr.parse(context.rawRequest.headers['x-appengine-user-ip']).match(staIp))) {
             let userId = '';
             let words = [];
             do {
-                words = niceware.generatePassphrase(10);
+                const dicewareOptions = {
+                    language: dicewareWord,
+                    wordcount: 5,
+                    format: 'array'
+                }
+                words = diceware(dicewareOptions);
 
                 const hash = crypto.createHash('sha256');
                 hash.update(words[0] + userNameSalt);
@@ -69,11 +109,21 @@ exports.register = functions.https.onCall(async (data, context) => {
                 created: admin.database.ServerValue.TIMESTAMP
             });
             await activeTokenRef.set(null);
+            const userTokenRef = admin.database().ref('token')
+                .child('users').orderByChild('token').equalTo(token);
+            const userTokenObj = (await userTokenRef.once('value')).val();
+            const userToken = userTokenObj && Object.keys(userTokenObj).length && Object.keys(userTokenObj)[0];
+            if (userToken) {
+                await admin.database().ref('token')
+                    .child('users').child(userToken).update({active: false});
+            }
             return {
                 result: 'ok',
                 token: customToken,
                 passphrase: words.join(' ')
             };
+        } else if (tokenExists && !tokenValid) {
+            await activeTokenRef.set(null);
         }
     }
     return {

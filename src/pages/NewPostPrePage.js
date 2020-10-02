@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, Card, Page, Toolbar} from "react-onsenui";
+import {Button, Page, Toolbar} from "react-onsenui";
 
-import {useHistory, useParams} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 
 function NewPostPrePage() {
     const history = useHistory();
+
     return (
         <Page
             renderToolbar={() =>
@@ -21,7 +22,7 @@ function NewPostPrePage() {
                 new text bubble
             </Button>
             <Button disabled modifier="large" style={{marginTop: 10, marginBottom: 10}}>
-                other bubble types coming soon
+                other bubble types (coming soon)
             </Button>
         </Page>
     );

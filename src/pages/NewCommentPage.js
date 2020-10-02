@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
-import {BackButton, BottomToolbar, Icon, Page, Toolbar, ToolbarButton} from "react-onsenui";
-import PostCard from "../components/PostCard";
+import {BackButton, BottomToolbar, Page, Toolbar, ToolbarButton} from "react-onsenui";
 import NewText from "../components/NewText";
 import {useHistory, useParams} from 'react-router-dom';
-import {useFirebase} from "react-redux-firebase";
+import {isEmpty, isLoaded, useFirebase} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {makeTextComment} from "../util/helpers";
 
 function ComponentTypeSwitcher(props) {
     switch (props.type) {
         case 'text':
+            return <NewText maxLength={140} data={props.data} setData={props.setData}/>
+        default:
             return <NewText maxLength={140} data={props.data} setData={props.setData}/>
     }
 }
@@ -19,14 +20,16 @@ function NewCommentPage(props) {
     const {postId, type} = useParams();
 
     const firebase = useFirebase();
-    const user = useSelector((state) => state.firebase.auth) ?? {};
-    const userProfile = useSelector((state) => state.firebase.profile) ?? {};
+    const user = useSelector((state) => state.firebase.auth);
 
     const [data, setData] = useState('');
 
     const addComment = async () => {
         switch (type) {
             case 'text':
+                await makeTextComment(firebase, user, postId, data);
+                break;
+            default:
                 await makeTextComment(firebase, user, postId, data);
                 break;
         }
@@ -41,7 +44,7 @@ function NewCommentPage(props) {
                             back
                         </BackButton>
                     </div>
-                    <div className="center" style={{textAlign: 'center'}}>
+                    <div className="center">
                         reply to bubble
                     </div>
                 </Toolbar>
@@ -51,6 +54,7 @@ function NewCommentPage(props) {
                     <div style={{height: '100%'}}>
                         <ToolbarButton
                             style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10}}
+                            disabled={!isLoaded(user) || isEmpty(user)}
                             onClick={() => {
                                 addComment();
                                 history.goBack();

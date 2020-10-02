@@ -82,6 +82,10 @@ path /users/{userId} {
     write() { isCurrentUser(userId) }
 }
 
+path /token/users/{userId} {
+    read() { isCurrentUser(userId) }
+}
+
 path /posts {
 
     path /owner {

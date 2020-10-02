@@ -1,18 +1,6 @@
 import React, {useState} from 'react';
-import {
-    BackButton,
-    Button,
-    Card,
-    Icon,
-    List,
-    ListItem,
-    Page,
-    Segment, Tab,
-    Tabbar,
-    Toolbar,
-    ToolbarButton
-} from "react-onsenui";
-import {SwipeableList, SwipeableListItem} from '@sandstreamdev/react-swipeable-list';
+import {Card, Icon} from "react-onsenui";
+import {SwipeableListItem} from '@sandstreamdev/react-swipeable-list';
 import {useHistory} from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 
@@ -20,6 +8,7 @@ function PostCard(props) {
     const [isSwiping, setIsSwiping] = useState(false);
     const [swipeProgress, setSwipeProgress] = useState(0);
     const history = useHistory();
+
     return (
         <SwipeableListItem
             threshold={0.1}
@@ -89,7 +78,7 @@ function PostCard(props) {
                             textAlign: 'center'
                         }}
                         onClick={() => {
-                            if (!isSwiping) {
+                            if (!isSwiping && !props.canDelete) {
                                 props.votePostUp(props.id);
                             }
                         }}>
@@ -100,7 +89,6 @@ function PostCard(props) {
                             transform: 'translate(-50%, -50%)',
                             fontSize: 20,
                             color: props.voteDirection === 'up' ? 'black' : 'gray',
-                            fontFamily: 'san-serif',
                             fontWeight: 100
                         }}>
                             {[props.upVotes]}
@@ -109,7 +97,7 @@ function PostCard(props) {
                 </div>
                 <div style={{
                     gridRow: '1/1', overflowWrap: 'break-word', hyphens: 'auto',
-                    paddingLeft: 40, paddingRight: 40, paddingBottom: 40
+                    paddingLeft: 40, paddingRight: 40, paddingBottom: 40, fontFamily: 'Grandstander'
                 }}
                      onClick={() => {
                          if (props.id && !isSwiping) {
@@ -131,7 +119,7 @@ function PostCard(props) {
                             textAlign: 'center'
                         }}
                         onClick={() => {
-                            if (!isSwiping) {
+                            if (!isSwiping && !props.canDelete) {
                                 props.votePostDown(props.id);
                             }
                         }}>
@@ -142,7 +130,6 @@ function PostCard(props) {
                             transform: 'translate(-50%, -50%)',
                             fontSize: 20,
                             color: props.voteDirection === 'down' ? 'black' : 'gray',
-                            fontFamily: 'san-serif',
                             fontWeight: 100
                         }}>
                             {props.downVotes}

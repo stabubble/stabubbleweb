@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {AlertDialog, BackButton, Button, Card, Input, Page, ProgressCircular, Toolbar} from "react-onsenui";
+import {AlertDialog, BackButton, Button, Input, Page, ProgressCircular, Toolbar} from "react-onsenui";
 import {useFirebase} from "react-redux-firebase";
 
 function LoginPage(props) {

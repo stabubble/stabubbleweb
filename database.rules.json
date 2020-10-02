@@ -6,19 +6,26 @@
         ".write": "(auth != null && auth.uid == $userId)"
       }
     },
+    "token": {
+      "users": {
+        "$userId": {
+          ".read": "(auth != null && auth.uid == $userId)"
+        }
+      }
+    },
     "posts": {
       "owner": {
         "$userId": {
           "posts": {
             "$postId": {
               ".validate": "newData.isBoolean()",
-              ".write": "(((data.val() == null && (auth != null && auth.uid == $userId)) && ($postId != null && root.child('posts').child('data').child('posts').child($postId).val() == null)) || (((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)) && ($postId != null && newData.parent().parent().parent().parent().parent().child('posts').child('data').child('posts').child($postId).val() == null)))"
+              ".write": "(((data.val() == null && (auth != null && auth.uid == $userId)) && ($postId != null && root.child('posts').child('data').child('posts').child($postId).val() == null)) || (((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)) && newData.parent().parent().parent().parent().parent().child('posts').child('data').child('posts').child($postId).val() == null))"
             }
           },
           "votes": {
             "$postId": {
               ".validate": "(newData.isString() && (newData.val() == 'up' || newData.val() == 'down'))",
-              ".write": "(((data.val() == null && (auth != null && auth.uid == $userId)) && ((newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('up').val() - root.child('posts').child('data').child('votes').child($postId).child('up').val() == 1 && newData.val() == 'up') || (newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('down').val() - root.child('posts').child('data').child('votes').child($postId).child('down').val() == 1 && newData.val() == 'down'))) || (((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)) && ((newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('up').val() - root.child('posts').child('data').child('votes').child($postId).child('up').val() == -1 && newData.val() == 'up') || (newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('down').val() - root.child('posts').child('data').child('votes').child($postId).child('down').val() == -1 && newData.val() == 'down'))))"
+              ".write": "(((data.val() == null && (auth != null && auth.uid == $userId)) && (root.child('posts').child('owner').child(auth.uid).child('votes').child($postId).val() == null && ((newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('up').val() - root.child('posts').child('data').child('votes').child($postId).child('up').val() == 1 && newData.val() == 'up') || (newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('down').val() - root.child('posts').child('data').child('votes').child($postId).child('down').val() == 1 && newData.val() == 'down')))) || (((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)) && ((((newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('up').val() - root.child('posts').child('data').child('votes').child($postId).child('up').val() == -1 && root.child('posts').child('owner').child(auth.uid).child('votes').child($postId).val() == 'up') || (newData.parent().parent().parent().parent().parent().child('posts').child('data').child('votes').child($postId).child('down').val() - root.child('posts').child('data').child('votes').child($postId).child('down').val() == -1 && root.child('posts').child('owner').child(auth.uid).child('votes').child($postId).val() == 'down')) && root.child('posts').child('owner').child(auth.uid).child('votes').child($postId).val() != null) && newData.parent().parent().parent().parent().parent().child('posts').child('owner').child(auth.uid).child('votes').child($postId).val() == null)))"
             }
           },
           ".read": "(auth != null && auth.uid == $userId)"
@@ -46,7 +53,7 @@
             "created": {
               ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
             },
-            ".write": "((data.val() == null && auth != null) && ($postId != null && newData.parent().parent().parent().parent().child('posts').child('owner').child(auth.uid).child('posts').child($postId).val() != null))"
+            ".write": "(((data.val() == null && auth != null) && ($postId != null && newData.parent().parent().parent().parent().child('posts').child('owner').child(auth.uid).child('posts').child($postId).val() != null)) || (((data.val() != null && newData.val() == null) && auth != null) && ($postId != null && root.child('posts').child('owner').child(auth.uid).child('posts').child($postId).val() != null)))"
           }
         },
         "votes": {
@@ -82,7 +89,7 @@
             "$postId": {
               "$commentId": {
                 ".validate": "(newData.isString() && (newData.val() == 'up' || newData.val() == 'down'))",
-                ".write": "(((data.val() == null && (auth != null && auth.uid == $userId)) && ((newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() == 1 && newData.val() == 'up') || (newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() == 1 && newData.val() == 'down'))) || (((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)) && ((newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() == -1 && newData.val() == 'up') || (newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() == -1 && newData.val() == 'down'))))"
+                ".write": "(((data.val() == null && (auth != null && auth.uid == $userId)) && ((newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() == 1 && newData.val() == 'up') || (newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() == 1 && newData.val() == 'down'))) || (((data.val() != null && newData.val() == null) && (auth != null && auth.uid == $userId)) && (((newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('up').val() == -1 && root.child('comments').child('owner').child(auth.uid).child('votes').child($postId).child($commentId).val() == 'up') || (newData.parent().parent().parent().parent().parent().parent().child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() - root.child('comments').child('data').child('votes').child($postId).child($commentId).child('down').val() == -1 && root.child('comments').child('owner').child(auth.uid).child('votes').child($postId).child($commentId).val() == 'down')) && newData.parent().parent().parent().parent().parent().parent().child('comments').child('owner').child(auth.uid).child('votes').child($postId).child($commentId).val() == null)))"
               }
             }
           },
@@ -109,7 +116,7 @@
               "created": {
                 ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
               },
-              ".write": "((data.val() == null && auth != null) && (($postId != null && $commentId != null) && newData.parent().parent().parent().parent().parent().child('comments').child('owner').child(auth.uid).child('comments').child($postId).child($commentId).val() != null))"
+              ".write": "(((data.val() == null && auth != null) && (($postId != null && $commentId != null) && newData.parent().parent().parent().parent().parent().child('comments').child('owner').child(auth.uid).child('comments').child($postId).child($commentId).val() != null)) || (((data.val() != null && newData.val() == null) && auth != null) && (($postId != null && $commentId != null) && root.child('comments').child('owner').child(auth.uid).child('comments').child($postId).child($commentId).val() != null)))"
             }
           }
         },

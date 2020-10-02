@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Comfortaa';
+  src: url('./fonts/Comfortaa.ttf') format('woff2 supports variations'),
+  url('./fonts/Comfortaa.ttf') format('woff2-variations');
+  font-weight: 100 300;
+  font-stretch: 25% 151%;
+}
+
+@font-face {
+  font-family: 'Grandstander';
+  src: url('./fonts/Grandstander.ttf') format('woff2 supports variations'),
+  url('./fonts/Grandstander.ttf') format('woff2-variations');
+  font-weight: 100 100;
+  font-stretch: 25% 151%;
+}
+
 html, body {
   position: fixed;
   overflow: hidden;
@@ -19,6 +35,24 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+div * {
+  font-family: 'Comfortaa', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+}
+
+.select-input, .button, .card, .alert-dialog-title, .alert-dialog-button,
+.tabbar__label, .toolbar__title, .toolbar-button, .segment__button,
+.page__content h1, .page__content h2, .page__content h3, .page__content h4, .page__content h5 {
+  font-family: 'Comfortaa', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif !important;
+}
+
+.swipeable-list {
+  height: unset !important;
 }
 
 code {

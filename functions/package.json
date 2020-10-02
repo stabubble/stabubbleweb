@@ -14,8 +14,11 @@
   },
   "main": "index.js",
   "dependencies": {
+    "diceware-generator": "^3.0.1",
+    "diceware-wordlist-en-eff": "^1.0.1",
     "firebase-admin": "^9.2.0",
     "firebase-functions": "^3.11.0",
+    "ipaddr.js": "^2.0.0",
     "niceware": "^2.0.1",
     "uuid": "^8.3.0"
   },

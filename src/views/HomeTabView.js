@@ -1,21 +1,35 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Page, Tab, Tabbar} from "react-onsenui";
+
 import HomePage from "../pages/HomePage";
-import SettingsPage from "../pages/SettingsPage";
-import NewPostPage from "../pages/NewPostPage";
 import MyPage from "../pages/MyPage";
 import NewPostPrePage from "../pages/NewPostPrePage";
-
-/*
-bgColor:#FFFFFF
-baseColor:#DB8DBD
-subColor:#F5D7E7
-subColor:#D1EAF4
- */
+import {useHistory, useParams} from "react-router-dom";
 
 function HomeTabView(props) {
+    const history = useHistory();
+    const {tab} = useParams();
+    const [index, setIndex] = useState(() => {
+        if (tab === 'posts') {
+            return 0;
+        } else if (tab === 'new') {
+            return 1;
+        } else if (tab === 'me') {
+            return 2;
+        } else {
+            history.replace('/');
+        }
+    });
 
-    const [index, setIndex] = useState(0);
+    useEffect(() => {
+        if (index === 0) {
+            window.history.replaceState({}, '', `/home/posts/`);
+        } else if (index === 1) {
+            window.history.replaceState({}, '', `/home/new`);
+        } else if (index === 2) {
+            window.history.replaceState({}, '', `/home/me/`);
+        }
+    }, [index]);
 
     return (
         <div>
