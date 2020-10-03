@@ -1,154 +1,657 @@
-//===https://github.com/FirebaseExtended/bolt/blob/master/docs/guide.md
+// https://github.com/FirebaseExtended/bolt/blob/master/docs/guide.md
+
+// ===== General Helper Function ======
+// Returns true if the value is intialized to init, or retains it's prior value, otherwise.
+initial (value, init) {
+    value == (prior(value) == null ? init : prior(value))
+}
+
+// Create but not update or delete
+createOnly (value) {
+    prior(value) == null && value != null
+}
+// ====================================
+
+// ===== Timestamp Helper Types =======
+// Have created and modified timestamp
 type Timestamped<T> extends T {
     modified: CurrentTimestamp,
     created: InitialTimestamp
 }
 
+// Current timestamp must be server time
 type CurrentTimestamp extends Number {
-    validate() { this == now }
+    validate() {
+        this == now
+    }
 }
 
+// Initial time might be server time and cannot be changed
 type InitialTimestamp extends Number {
-    validate() { initial(this, now) }
+    validate() {
+        initial(this, now)
+    }
+}
+// ====================================
+
+// ===== Authentication Helper Function
+
+// Signed in and path params matches current user
+isCurrentUser (uid) {
+    isSignedIn() && auth.uid == uid
 }
 
-// Returns true if the value is intialized to init, or retains it's prior value, otherwise.
-initial(value, init) { value == (prior(value) == null ? init : prior(value)) }
-isCurrentUser(uid) { isSignedIn() && auth.uid == uid }
-isSignedIn() { auth != null }
-createOnly(value) { prior(value) == null && value != null }
-postDoesNotExist(postId) { postId != null && prior(root.posts.data.posts[postId]) == null}
-postDeletedAtSameTime(postId){  root.posts.data.posts[postId] == null }
-votedAtSameTimeAndNotVoted(postId,dir){(prior(root.posts.owner[auth.uid].votes[postId])==null)&&
-    ((root.posts.data.votes[postId].up-prior(root.posts.data.votes[postId].up)==1&&dir=='up')||
-    (root.posts.data.votes[postId].down-prior(root.posts.data.votes[postId].down)==1&&dir=='down'))}
-removedVoteAtSameTimeAndHasVoted(postId){
-    ((root.posts.data.votes[postId].up-prior(root.posts.data.votes[postId].up)==-1&&
-    prior(root.posts.owner[auth.uid].votes[postId])=='up')||
-    (root.posts.data.votes[postId].down-prior(root.posts.data.votes[postId].down)==-1&&
-    prior(root.posts.owner[auth.uid].votes[postId])=='down'))&&
-    (prior(root.posts.owner[auth.uid].votes[postId])!=null)&&root.posts.owner[auth.uid].votes[postId]==null}
-postIdOwned(postId){
-    postId!=null&&root.posts.owner[auth.uid].posts[postId]!=null}
+// Authenticated user
+isSignedIn () {
+    auth != null
+}
+// ====================================
 
-postIdPrevOwned(postId){
-    postId!=null&&prior(root.posts.owner[auth.uid].posts[postId])!=null}
-commentDoesNotExist(postId,commentId){prior(root.comments.data.comments[postId][commentId])==null}
-commentDeletedAtSameTime(postId,commentId){root.comments.data.comments[postId][commentId]==null}
+// ===== Post Helpers =================
+// checks postId exist in list of posts
+postExist (postId) {
+    postId != null && prior(root.posts.data.posts[postId]) != null
+}
 
-commentVotedAtSameTimeAndNotVoted(postId,commentId,dir){
-    ((root.comments.data.votes[postId][commentId].up-prior(root.comments.data.votes[postId][commentId].up)==1&&dir=='up')||
-    (root.comments.data.votes[postId][commentId].down-prior(root.comments.data.votes[postId][commentId].down)==1&&dir=='down'))}
-commentRemovedVoteAtSameTimeAndHasVoted(postId,commentId){
-    ((root.comments.data.votes[postId][commentId].up-prior(root.comments.data.votes[postId][commentId].up)==-1&&
-    prior(root.comments.owner[auth.uid].votes[postId][commentId])=='up')||
-    (root.comments.data.votes[postId][commentId].down-prior(root.comments.data.votes[postId][commentId].down)==-1&&
-    prior(root.comments.owner[auth.uid].votes[postId][commentId])=='down'))&&
-    root.comments.owner[auth.uid].votes[postId][commentId]==null}
+// checks postId does not exist in list of posts
+postDoesNotExist (postId) {
+    postId != null && prior(root.posts.data.posts[postId]) == null
+}
 
-commentIdOwned(postId,commentId){
-    postId!=null&&commentId!=null&&root.comments.owner[auth.uid].comments[postId][commentId]!=null}
+// checks posts data for postId is deleted
+postDataDeletedAtSameTime (postId) {
+    root.posts.data.posts[postId] == null &&
+    root.posts.data.votes[postId] == null
+}
 
-commentIdPrevOwned(postId,commentId){
-    postId!=null&&commentId!=null&&prior(root.comments.owner[auth.uid].comments[postId][commentId]!=null)}
-//===
+// restrict posts to query
+postsQueryOnly() {
+    query.orderByChild == 'location' &&
+    query.equalTo == root.users[auth.uid].location &&
+    query.limitToLast <= 200
+}
+
+// owns the postid
+postIdOwned (postId) {
+    postId != null && root.posts.owner[auth.uid].posts[postId] != null
+}
+
+// does not own the postid
+postIdNotOwned (postId) {
+    postId != null && root.posts.owner[auth.uid].posts[postId] == null
+}
+
+// did own the postid
+postIdPrevOwned (postId) {
+    postId != null &&
+    prior(root.posts.owner[auth.uid].posts[postId]) != null &&
+    root.posts.owner[auth.uid].posts[postId] == null
+}
+// ====================================
+
+// ===== Post Vote Helpers ============
+// checks vote is created with initial values
+voteInitial (vote) {
+    vote.up == 0 && vote.down == 0
+}
+
+// check user updated own vote direction on vote update
+voteDirectionUpdated (vote, postId) {
+    (
+        vote.up - prior(vote.up) == 1 &&
+        vote.down - prior(vote.down) == 0 &&
+        prior(root.posts.owner[auth.uid].votes[postId]) == null &&
+        root.posts.owner[auth.uid].votes[postId] == 'up'
+    ) ||
+    (
+        vote.up - prior(vote.up) == -1 &&
+        vote.down - prior(vote.down) == 0 &&
+        prior(root.posts.owner[auth.uid].votes[postId]) == 'up' &&
+        root.posts.owner[auth.uid].votes[postId] == null
+    ) ||
+    (
+        vote.up - prior(vote.up) == 0 &&
+        vote.down - prior(vote.down) == 1 &&
+        prior(root.posts.owner[auth.uid].votes[postId]) == null &&
+        root.posts.owner[auth.uid].votes[postId] == 'down'
+    ) ||
+    (
+        vote.up - prior(vote.up) == 0 &&
+        vote.down - prior(vote.down) == -1 &&
+        prior(root.posts.owner[auth.uid].votes[postId]) == 'down' &&
+        root.posts.owner[auth.uid].votes[postId] == null
+    )
+}
+
+// makes sure has not voted and ensure only current vote direction has changed
+votedAtSameTimeAndNotVoted (direction, postId) {
+    prior(direction) == null &&
+    (
+        (
+            direction == 'up' &&
+            root.posts.data.votes[postId].up - prior(root.posts.data.votes[postId].up) == 1 &&
+            root.posts.data.votes[postId].down - prior(root.posts.data.votes[postId].down) == 0
+        )
+        ||
+        (
+            direction == 'down' &&
+            root.posts.data.votes[postId].down - prior(root.posts.data.votes[postId].down) == 1 &&
+            root.posts.data.votes[postId].up - prior(root.posts.data.votes[postId].up) == 0
+        )
+    )
+}
+
+// makes sure that user has voted before and has now removed their vote
+removedVoteAtSameTimeAndHasVoted (direction, postId) {
+    (prior(direction) != null && direction == null) &&
+    (
+        (
+            prior(direction) == 'up' &&
+            root.posts.data.votes[postId].up - prior(root.posts.data.votes[postId].up) == -1 &&
+            root.posts.data.votes[postId].down - prior(root.posts.data.votes[postId].down) == 0
+        )
+        ||
+        (
+            prior(direction) == 'down' &&
+            root.posts.data.votes[postId].down - prior(root.posts.data.votes[postId].down) == -1 &&
+            root.posts.data.votes[postId].up - prior(root.posts.data.votes[postId].up) == 0
+        )
+    )
+}
+// ====================================
+
+// ===== Comment Helpers ==============
+// comment does not exist
+commentDoesNotExist (postId, commentId) {
+    postId != null && commentId != null && prior(root.comments.data.comments[postId][commentId]) == null
+}
+
+// checks comment data for commentId is deleted
+commentDeletedAtSameTime (postId,commentId) {
+    root.comments.data.comments[postId][commentId] == null &&
+    root.comments.data.votes[postId][commentId] == null
+}
+
+// owns the commentid
+commentIdOwned (postId, commentId) {
+    postId != null && commentId != null && root.comments.owner[auth.uid].comments[postId][commentId] != null
+}
+
+// does not own the commentid
+commentIdNotOwned (postId, commentId) {
+    postId != null && commentId != null && root.comments.owner[auth.uid].comments[postId][commentId] == null
+}
+
+// did own the commentid
+commentIdPrevOwned (postId, commentId) {
+    postId != null && commentId != null &&
+    prior(root.comments.owner[auth.uid].comments[postId][commentId]) != null &&
+    root.comments.owner[auth.uid].comments[postId][commentId] == null
+}
+// ====================================
+
+// ===== Comment Vote Helpers =========
+// check user updated own vote direction on vote update
+commentVoteDirectionUpdated (vote, postId, commentId) {
+    (
+        vote.up - prior(vote.up) == 1 &&
+        vote.down - prior(vote.down) == 0 &&
+        prior(root.comments.owner[auth.uid].votes[postId][commentId]) == null &&
+        root.comments.owner[auth.uid].votes[postId][commentId] == 'up'
+    ) ||
+    (
+        vote.up - prior(vote.up) == -1 &&
+        vote.down - prior(vote.down) == 0 &&
+        prior(root.comments.owner[auth.uid].votes[postId][commentId]) == 'up' &&
+        root.comments.owner[auth.uid].votes[postId][commentId] == null
+    ) ||
+    (
+        vote.up - prior(vote.up) == 0 &&
+        vote.down - prior(vote.down) == 1 &&
+        prior(root.comments.owner[auth.uid].votes[postId][commentId]) == null &&
+        root.comments.owner[auth.uid].votes[postId][commentId] == 'down'
+    ) ||
+    (
+        vote.up - prior(vote.up) == 0 &&
+        vote.down - prior(vote.down) == -1 &&
+        prior(root.comments.owner[auth.uid].votes[postId][commentId]) == 'down' &&
+        root.comments.owner[auth.uid].votes[postId][commentId] == null
+    )
+}
+
+// makes sure has not voted and ensure only current vote direction has changed
+commentVotedAtSameTimeAndNotVoted (direction, postId, commentId) {
+    prior(direction) == null &&
+    (
+        (
+            direction == 'up' &&
+            root.comments.data.votes[postId][commentId].up -
+                prior(root.comments.data.votes[postId][commentId].up) == 1 &&
+            root.comments.data.votes[postId][commentId].down -
+                prior(root.comments.data.votes[postId][commentId].down) == 0
+        )
+        ||
+        (
+            direction == 'down' &&
+            root.comments.data.votes[postId][commentId].down -
+                prior(root.comments.data.votes[postId][commentId].down) == 1 &&
+            root.comments.data.votes[postId][commentId].up -
+                prior(root.comments.data.votes[postId][commentId].up) == 0
+        )
+    )
+}
+
+commentRemovedVoteAtSameTimeAndHasVoted (direction, postId,commentId) {
+    (prior(direction) != null && direction == null) &&
+    (
+        (
+            prior(direction) == 'up' &&
+            root.comments.data.votes[postId][commentId].up -
+                prior(root.comments.data.votes[postId][commentId].up) == -1 &&
+            root.comments.data.votes[postId][commentId].down -
+                prior(root.comments.data.votes[postId][commentId].down) == 0
+        )
+        ||
+        (
+            prior(direction) == 'down' &&
+            root.comments.data.votes[postId][commentId].down -
+                prior(root.comments.data.votes[postId][commentId].down) == -1 &&
+            root.comments.data.votes[postId][commentId].up -
+                prior(root.comments.data.votes[postId][commentId].up) == 0
+        )
+    )
+}
+// ====================================
+
+// ===== Type Definitions =============
+type Profile {
+    location: String
+
+    validate() {
+        this.location.length <= 20
+    }
+}
 
 type TextMessageWithLocation extends TextMessage {
-  location: String
+    location: String
+
+    validate() {
+        this.location.length <= 20
+    }
 }
 
 type TextMessageContent extends String {
-    validate() { this.length < 280 }
+    validate() {
+        this.length <= 280
+    }
 }
 
 type TextMessage {
     type: String,
     content: TextMessageContent
 
-    validate() { this.type == 'text' }
+    validate() {
+        this.type == 'text'
+    }
 }
 
 type VoteDirection extends String {
-    validate() { this == 'up' || this == 'down' }
+    validate() {
+        this == 'up' || this == 'down'
+    }
 }
 
 type Vote {
     up: Number,
     down: Number
+
+    validate() {
+        this.up >=0 && this.down >= 0
+    }
 }
 
-path /users/{userId} {
-    read() { isCurrentUser(userId) }
-    write() { isCurrentUser(userId) }
+// ====================================
+
+// ===== Rules ========================
+
+/*
+stores authentication information for login
+only accessed from admin sdk
+format:
+    hash_of_username {
+        created: now:number
+        hash: scrypt_of_password:string
+        salt: salt_of_password:string
+        uid: id_of_user:string
+    }
+*/
+path /auth {
+    index() {
+        ["uid"]
+    }
 }
 
-path /token/users/{userId} {
-    read() { isCurrentUser(userId) }
+/*
+stores user profile
+only allow owner to read, create and update but not delete
+format:
+    userid {
+        location: string
+    }
+*/
+path /users/{userId} is Profile {
+    read() {
+        isCurrentUser(userId)
+    }
+    create() {
+        isCurrentUser(userId)
+    }
+    update() {
+        isCurrentUser(userId)
+    }
 }
 
+// token store
+path /token {
+    /*
+    stores current invite tokens
+    only through admin sdk
+    format:
+        invite_token: created_time: now:number
+    path /active {}
+
+    /*
+    stores token for user invites
+    only read for current user, everything else is through admin sdk
+    format:
+        userid {
+            active: boolean
+            created: now:number
+            token: string
+        }
+    */
+    path /users {
+        index() {
+            ["token"]
+        }
+
+        path /{userId} {
+            read() { isCurrentUser(userId) }
+        }
+    }
+}
+
+/*
+stores posts, post owners and post votes
+*/
 path /posts {
-
+    /*
+    stores owner info for posts and post votes
+    */
     path /owner {
+        /*
+        stores owner data for a user
+        only read for current user at this level
+        */
         path /{userId} {
-            read() { isCurrentUser(userId) }
+            // read by the owning user
+            read() {
+                isCurrentUser(userId)
+            }
+
+            /*
+            stores which posts the user owns (can create and delete)
+            only create and delete
+            format:
+                postid: boolean
+            */
             path /posts/{postId} is Boolean {
-                create() { isCurrentUser(userId) && postDoesNotExist(postId) }
-                delete() { isCurrentUser(userId) && postDeletedAtSameTime(postId) }
+                // only allow create if postid does not exist in posts
+                create() {
+                    isCurrentUser(userId) && postDoesNotExist(postId)
+                }
+                // only user to delete if they delete their post and post votes at the same time
+                delete() {
+                    isCurrentUser(userId) && postDataDeletedAtSameTime(postId)
+                }
             }
 
+            /*
+            stores which posts the user has voted on and which direction
+            only create and delete, to change have to delete and re-create
+            format:
+                postid: {
+                    direction: string
+                }
+            */
             path /votes/{postId} is VoteDirection {
-                    create() { isCurrentUser(userId) && votedAtSameTimeAndNotVoted(postId,this) }
-                    delete() { isCurrentUser(userId) && removedVoteAtSameTimeAndHasVoted(postId) }
+                // only create if user updates votes correctly at same time
+                create() {
+                    isCurrentUser(userId) && votedAtSameTimeAndNotVoted(this, postId)
+                }
+                // only delete if user removes vote correctly at same time
+                delete() {
+                    isCurrentUser(userId) && removedVoteAtSameTimeAndHasVoted(this, postId)
+                }
             }
         }
     }
 
+    /*
+    stores the actual post and vote data
+    */
     path /data {
-        read() { isSignedIn() }
+        /*
+        stores the posts
+        only create and delete for now
+        format:
+            postid: {
+                content: string
+                created: now:number
+                location: string
+                modified: now:number
+                type: string
+            }
+        */
+        path /posts {
+            // only read at this level for query searching od current location of user and limit to 200
+            read() {
+                isSignedIn() && postsQueryOnly()
+            }
+            index() {
+                ["location"]
+            }
 
-        path /posts/{postId} is Timestamped<TextMessageWithLocation> {
-            create() { isSignedIn()  && postIdOwned(postId)}
-            delete() { isSignedIn() && postIdPrevOwned(postId)}
+            // current text message with location, more messages to be implemented
+            path /{postId} is Timestamped<TextMessageWithLocation> {
+                // read for users with postId
+                read() {
+                    isSignedIn()
+                }
+
+                // own the postid
+                create() {
+                    isSignedIn() && postIdOwned(postId)
+                }
+
+                // did own the postid
+                delete() {
+                    isSignedIn() && postIdPrevOwned(postId)
+                }
+            }
         }
 
+        /*
+        stores the votes
+        only create with zero values and delete for post owner
+        only update with vote direction update by anyone but not the owner
+        format:
+            postid: {
+                up: number
+                down: number
+            }
+        */
         path /votes/{postId} is Vote {
-            write() { true }
+            // read for users with postId
+            read() {
+                isSignedIn()
+            }
+
+            // vote is created by post owner and must be set to initial values
+            create() {
+                isSignedIn() && postIdOwned(postId) && voteInitial(this)
+            }
+
+            // update by anyone not the owner as long as they update their owned vote direction too
+            update() {
+                isSignedIn() && postIdNotOwned(postId) && voteDirectionUpdated(this, postId)
+            }
+
+            // vote can be deleted by the post owner when the post is deleted
+            delete() {
+                isSignedIn() && postIdPrevOwned(postId)
+            }
         }
-
     }
-
 }
 
-
+/*
+stores comments, comment owners and comment votes
+*/
 path /comments {
-
+    /*
+        stores owner info for comments and comment votes
+    */
     path /owner {
+        /*
+                stores owner data for a user
+                only read for current user at this level
+        */
         path /{userId} {
-            read() { isCurrentUser(userId) }
+            // read by owning user
+            read() {
+                isCurrentUser(userId)
+            }
+
+            /*
+            stores which comments the user owns (can create and delete)
+            only create and delete
+            format:
+                postid: {
+                    commentid: boolean
+                }
+            */
             path /comments/{postId}/{commentId} is Boolean {
-                create() { isCurrentUser(userId) && !postDoesNotExist(postId) && commentDoesNotExist(postId,commentId) }
-                delete() { isCurrentUser(userId)  && !postDoesNotExist(postId) && commentDeletedAtSameTime(postId,commentId) }
+                // only allow create if postid exist in posts and commentid does not exist
+                create() {
+                    isCurrentUser(userId) &&
+                    postExist(postId) &&
+                    commentDoesNotExist(postId, commentId)
+                }
+                // only user to delete if they delete their comment and comment votes at the same time
+                delete() {
+                    isCurrentUser(userId) &&
+                    postExist(postId) &&
+                    commentDeletedAtSameTime(postId, commentId)
+                }
             }
 
+            /*
+            stores which posts the user has voted on and which direction
+            only create and delete, to change have to delete and re-create
+            format:
+                postid: {
+                    commentid: {
+                        direction: string
+                    }
+                }
+            */
             path /votes/{postId}/{commentId} is VoteDirection {
-                create() { isCurrentUser(userId) && commentVotedAtSameTimeAndNotVoted(postId,commentId,this) }
-                delete() { isCurrentUser(userId) && commentRemovedVoteAtSameTimeAndHasVoted(postId,commentId) }
+                // only create if user updates votes correctly at same time
+                create() {
+                    isCurrentUser(userId) && commentVotedAtSameTimeAndNotVoted(this, postId, commentId)
+                }
+                // only create if user updates votes correctly at same time
+                delete() {
+                    isCurrentUser(userId) && commentRemovedVoteAtSameTimeAndHasVoted(this, postId, commentId)
+                }
             }
         }
     }
 
+    /*
+    stores the actual comment and vote data
+    read only on specific subkey, do not allow listing
+    */
     path /data {
-        read() { isSignedIn() }
+        /*
+        stores the comments
+        only create and delete for now
+        format:
+            postid: {
+                commentid: {
+                    content: string
+                    created: now:number
+                    modified: now:number
+                    type: string
+                }
+            }
+        */
+        path /comments/{postId}  {
+            // read for users with postId
+            read() {
+                isSignedIn()
+            }
 
-        path /comments/{postId}/{commentId} is Timestamped<TextMessage> {
-            create() { isSignedIn()  && commentIdOwned(postId,commentId)}
-            delete() { isSignedIn()  && commentIdPrevOwned(postId,commentId)}
+            // curent text comment, more comments to be implemented
+            path /{commentId} is Timestamped<TextMessage> {
+                // own the commentid
+                create() {
+                    isSignedIn() && commentIdOwned(postId, commentId)
+                }
+
+                // did own the commentid
+                delete() {
+                    isSignedIn() && commentIdPrevOwned(postId, commentId)
+                }
+            }
         }
 
-        path /votes/{postId}/{commentId} is Vote {
-            write() { true }
-        }
+        /*
+        stores the votes
+        only create with zero values and delete for comment owner
+        only update with vote direction update by anyone but not the owner
+        format:
+            postid: {
+                commentid: {
+                    up: number
+                    down: number
+                }
+            }
+        */
+        path /votes/{postId} {
+            // read for users with postId
+            read() {
+                isSignedIn()
+            }
 
+            path /{commentId} is Vote {
+                // vote is created by comment owner and must be set to initial values
+                create() {
+                    isSignedIn() && commentIdOwned(postId, commentId) && voteInitial(this)
+                }
+
+                // update by anyone not the owner as long as they update their owned vote direction too
+                update() {
+                    isSignedIn() && commentIdNotOwned(postId, commentId) &&
+                    commentVoteDirectionUpdated(this, postId, commentId)
+                }
+
+                // vote can be deleted by the post owner when the post is deleted
+                delete() {
+                    isSignedIn() && commentIdPrevOwned(postId, commentId)
+                }
+            }
+        }
     }
-
 }
