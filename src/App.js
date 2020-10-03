@@ -17,6 +17,7 @@ import {BrowserRouter} from "react-router-dom";
 import {AppContext, firebaseDevConfig, firebaseProdConfig, firebaseStagingConfig, reduxFirebase} from "./config";
 
 import AppRouter from "./AppRouter";
+import {Helmet} from "react-helmet";
 
 let environment = 'prod';
 
@@ -51,6 +52,19 @@ const rrfProps = {
 function App(props) {
     return (
         <AppContext.Provider value={{version: 0.2, status: 'beta', environment}}>
+            {environment === 'prod' ?
+                <Helmet>
+                    <meta name="description" content="st andrews anonymous chat"/>
+                    <link rel="manifest" href={`${process.env.PUBLIC_URL}/manifest.json`}/>
+                    <title>stabubble | st andrews anonymous chat</title>
+                </Helmet> :
+                <Helmet>
+                    <meta name="robots" content="noindex, nofollow"/>
+                    <meta name="description" content={`st andrews anonymous chat ${environment}`}/>
+                    <link rel="manifest" href={`${process.env.PUBLIC_URL}/manifest.staging.json`}/>
+                    <title>stabubble {environment} | st andrews anonymous chat</title>
+                </Helmet>
+            }
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
                     <BrowserRouter>
