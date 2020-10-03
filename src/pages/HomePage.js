@@ -113,9 +113,8 @@ function HomePage(props) {
                                                                        value={loc.id}>{loc.name}</option>) :
                                 locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
                         </Select>
-
                         :
-                        <Select value="loading" style={{paddingLeft: 15, paddingTop: 5}}>
+                        <Select value="loading" style={{paddingLeft: 15, paddingRight: 15}}>
                             <option key="loading">loading</option>
                         </Select>
                     }
