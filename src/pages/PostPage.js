@@ -142,6 +142,7 @@ function PostPage(props) {
                             votePostDown={votePostDown}
                             deletePost={doDeletePost}
                             commentsLength={Object.keys(comments ?? {}).length}
+                            disableClick={true}
                         />
                     </motion.div>
                     <hr style={{margin: 0, borderColor: '#cfcfc4', borderWidth: 2, borderStyle: 'solid'}}/>
@@ -188,6 +189,7 @@ function PostPage(props) {
                                                 votePostUp={voteCommentUp}
                                                 votePostDown={voteCommentDown}
                                                 deletePost={doDeleteComment}
+                                                disableClick={true}
                                             />
                                         </motion.div>
                                     )}

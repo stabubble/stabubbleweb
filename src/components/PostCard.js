@@ -100,7 +100,7 @@ function PostCard(props) {
                     paddingLeft: 40, paddingRight: 40, paddingBottom: 40, fontFamily: 'Grandstander'
                 }}
                      onClick={() => {
-                         if (props.id && !isSwiping) {
+                         if (props.id && !isSwiping && !props.disableClick) {
                              history.push('/post/' + props.id)
                          } else {
                              setIsSwiping(false);
