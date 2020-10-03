@@ -42,23 +42,25 @@ function SettingsPage(props) {
         setDisplayWarning(true);
     }
 
+    const logout = async () => {
+        await firebase.logout();
+        history.push('/welcome');
+    }
+
     const doAction = async () => {
         switch (warningAction) {
             case 'logout':
-                await firebase.logout();
-                history.push('/welcome');
+                logout();
                 break;
             case 'logoutAll':
                 const logoutAll = firebase.functions().httpsCallable('logoutAll');
                 await logoutAll();
-                setWarningAction('logout');
-                await doAction();
+                logout();
                 break;
             case 'deleteAccount':
                 const deleteUser = firebase.functions().httpsCallable('deleteUser');
                 await deleteUser();
-                setWarningAction('logout');
-                await doAction();
+                logout();
                 break;
             default:
                 break;
