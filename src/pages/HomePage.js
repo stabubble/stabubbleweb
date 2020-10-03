@@ -148,7 +148,7 @@ function HomePage(props) {
                                         return 0;
                                     })
                                     .map(([key, value]) =>
-                                        <motion.div key={key} layoutId={key} layout
+                                        <motion.div key={`home_${key}`} layout
                                                     style={{zIndex: 1000, position: 'relative'}}>
                                             <PostCard
                                                 id={key}
