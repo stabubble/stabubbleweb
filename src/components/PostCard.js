@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Card, Icon} from "react-onsenui";
+import {AlertDialog, Button, Card, Icon} from "react-onsenui";
 import {SwipeableListItem} from '@sandstreamdev/react-swipeable-list';
 import {useHistory} from 'react-router-dom';
 import TimeAgo from 'react-timeago';
@@ -8,6 +8,8 @@ function PostCard(props) {
     const [isSwiping, setIsSwiping] = useState(false);
     const [swipeProgress, setSwipeProgress] = useState(0);
     const history = useHistory();
+
+    const [displayWarning, setDisplayWarning] = useState(false);
 
     return (
         <SwipeableListItem
@@ -23,7 +25,7 @@ function PostCard(props) {
                                 style={{paddingRight: 20}}
                             />
                         </div>,
-                        action: () => props.deletePost(props.id)
+                        action: () => setDisplayWarning(true)
                     }
                     :
                     {
@@ -144,6 +146,20 @@ function PostCard(props) {
                     <div style={{position: 'absolute', bottom: 20, right: 20, color: 'gray', fontSize: 'small'}}>
                         {props.commentsLength} replies
                     </div> : null}
+                <AlertDialog isOpen={displayWarning} onCancel={() => setDisplayWarning(false)} cancelable>
+                    <div className="alert-dialog-title">delete?</div>
+                    <div className="alert-dialog-content">
+                        are you sure?
+                    </div>
+                    <div className="alert-dialog-footer">
+                        <Button onClick={() => props.deletePost(props.id)} className="alert-dialog-button">
+                            yes
+                        </Button>
+                        <Button onClick={() => setDisplayWarning(false)} className="alert-dialog-button">
+                            no
+                        </Button>
+                    </div>
+                </AlertDialog>
             </Card>
         </SwipeableListItem>
     )
