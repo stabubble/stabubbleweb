@@ -51,7 +51,7 @@ const rrfProps = {
 
 function App(props) {
     return (
-        <AppContext.Provider value={{version: 0.3, status: 'beta', environment}}>
+        <AppContext.Provider value={{version: 0.4, status: 'beta', environment}}>
             {environment === 'prod' ?
                 <Helmet>
                     <meta name="description" content="st andrews anonymous chat"/>
