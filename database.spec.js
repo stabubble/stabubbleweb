@@ -575,21 +575,21 @@ describe("profile rules", () => {
                 },
             })
         await firebase.assertFails(
-            bob.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+            alice.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
         );
         await firebase.assertFails(
             noone.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
         );
 
         await firebase.assertSucceeds(
-            alice.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+            bob.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
         );
@@ -614,27 +614,27 @@ describe("profile rules", () => {
                     down: 0
                 },
             })
-            alice.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+            bob.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
 
         await firebase.assertFails(
-            bob.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: null,
+            alice.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: null,
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(-1)
             })
         );
         await firebase.assertFails(
             noone.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: null,
+                [`owner/bob/votes/${aliceKey.key}`]: null,
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(-1)
             })
         );
 
         await firebase.assertSucceeds(
-            alice.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: null,
+            bob.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: null,
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(-1)
             })
         );
@@ -660,20 +660,20 @@ describe("profile rules", () => {
                 },
             })
         await firebase.assertSucceeds(
-            alice.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+            bob.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
         );
         await firebase.assertFails(
-            alice.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+            bob.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
         );
         await firebase.assertFails(
-            alice.ref('posts').update( {
-                [`owner/alice/votes/${aliceKey.key}`]: 'up',
+            bob.ref('posts').update( {
+                [`owner/bob/votes/${aliceKey.key}`]: 'up',
                 [`data/votes/${aliceKey.key}/up`]: firebase.database.ServerValue.increment(+1)
             })
         );
