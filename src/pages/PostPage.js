@@ -137,14 +137,15 @@ function PostPage(props) {
                                 upVotes={vote.up ?? 0}
                                 downVotes={vote.down ?? 0}
                                 created={post.created}
-                                canDelete={userPosts?.posts?.[postId] ?? false}
+                                canVote={!userPosts?.posts?.[postId] ?? true}
                                 voteDirection={userPosts?.votes?.[postId] ?? ''}
                                 votePostUp={votePostUp}
                                 votePostDown={votePostDown}
                                 deletePost={doDeletePost}
                                 commentsLength={Object.keys(comments ?? {}).length}
                                 disableClick={true}
-                                hightlightBackground={true}
+                                backgroundColor={'snow'}
+                                canDelete={userPosts?.posts?.[postId] ?? false}
                             />
                         </motion.div>
                         <hr style={{margin: 0, borderColor: '#cfcfc4', borderWidth: 2, borderStyle: 'solid'}}/>
@@ -185,13 +186,15 @@ function PostPage(props) {
                                                     upVotes={value.upVotes}
                                                     downVotes={value.downVotes}
                                                     created={value.created}
-                                                    canDelete={value.owner}
+                                                    canVote={!value.owner}
                                                     voteDirection={value.voteDirection}
                                                     votePostUp={voteCommentUp}
                                                     votePostDown={voteCommentDown}
                                                     deletePost={doDeleteComment}
                                                     disableClick={true}
                                                     comment={true}
+                                                    canDelete={value.owner}
+                                                    backgroundColor={value.owner ? 'mintcream' : null}
                                                 />
                                             </motion.div>
                                         )}

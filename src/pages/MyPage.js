@@ -144,13 +144,14 @@ function MyPage(props) {
                                             upVotes={value.upVotes}
                                             downVotes={value.downVotes}
                                             created={value.created}
-                                            canDelete={value.owner}
+                                            canVote={false}
                                             voteDirection={value.voteDirection}
                                             votePostUp={votePostUp}
                                             votePostDown={votePostDown}
                                             deletePost={doDeletePost}
                                             commentsLength={value.commentsLength}
                                             location={locationsMap?.[value.location] ?? 'unknown location'}
+                                            canDelete={value.owner}
                                         />
                                     </motion.div>
                                 )}
