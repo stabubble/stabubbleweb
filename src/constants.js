@@ -8,7 +8,13 @@ export const locations = [
     {id: 'abh', name: 'abh & powell'},
     {id: 'andrew_meville', name: 'andrew meville'},
     {id: 'uni_hall', name: 'uni hall & whitehorn'},
-    {id: 'bad_lands', name: 'bad lands'}
+    {id: 'jbh', name: 'john burnet hall & annexe'},
+    {id: 'mcintosh', name: 'macintosh hall'},
+    {id: 'st_regulus', name: 'st regulus hall'},
+    {id: 'st_salvators', name: 'st salvator\'s'},
+    {id: 'gannochy', name: 'gannochy house'},
+    {id: 'deans_court', name: 'deans court'},
+    {id: 'bad_lands', name: 'bad lands / outskirts'}
 ];
 
 export const locationsAndWelcome = [
