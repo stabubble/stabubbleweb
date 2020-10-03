@@ -38,6 +38,15 @@ function NewPostPage(props) {
 
     return (
         <Page
+            onKeyDown={(event) => {
+                if (!event.shiftKey && (event.key === "Enter" || event.key === "NumpadEnter")) {
+                    if (isLoaded(user) && isLoaded(userProfile) &&
+                        !isEmpty(user) && !isEmpty(userProfile) && data) {
+                        addPost();
+                        history.push('/');
+                    }
+                }
+            }}
             renderToolbar={() =>
                 <Toolbar>
                     <div className="left">
@@ -55,8 +64,8 @@ function NewPostPage(props) {
                     <div style={{height: '100%'}}>
                         <ToolbarButton
                             style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10}}
-                            disabled={!isLoaded(user) || !isLoaded(userProfile)
-                            || isEmpty(user) || isEmpty(userProfile) || !data}
+                            disabled={!isLoaded(user) || !isLoaded(userProfile) ||
+                            isEmpty(user) || isEmpty(userProfile) || !data}
                             onClick={() => {
                                 addPost();
                                 history.push('/');

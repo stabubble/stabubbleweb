@@ -97,19 +97,30 @@ function HomePage(props) {
             }
             contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
             <div>
-                {isLoaded(userProfile) && !isEmpty(userProfile) ?
-                    <Select value={userProfile?.location}
-                            onChange={updateLocation}
-                            style={{paddingLeft: 15, paddingTop: 5}}>
-                        {userProfile?.location === 'welcome' ?
-                            locationsAndWelcome.map(loc => <option key={loc.id}
-                                                                   value={loc.id}>{loc.name}</option>) :
-                            locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
-                    </Select> :
-                    <Select value="loading" style={{paddingLeft: 15, paddingTop: 5}}>
-                        <option key="loading">loading</option>
-                    </Select>
-                }
+
+                <div style={{
+                    paddingLeft: 15, paddingTop: 5, display: 'inline-flex',
+                    alignItems: 'center', minHeight: 40
+                }}>
+                    <span>you are at</span>
+                    {isLoaded(userProfile) && !isEmpty(userProfile) ?
+                        <Select value={userProfile?.location}
+                                style={{paddingLeft: 15, paddingRight: 15}}
+                                onChange={updateLocation}
+                        >
+                            {userProfile?.location === 'welcome' ?
+                                locationsAndWelcome.map(loc => <option key={loc.id}
+                                                                       value={loc.id}>{loc.name}</option>) :
+                                locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
+                        </Select>
+
+                        :
+                        <Select value="loading" style={{paddingLeft: 15, paddingTop: 5}}>
+                            <option key="loading">loading</option>
+                        </Select>
+                    }
+                    {userProfile?.location === 'welcome' ? <span>(tap/click to change)</span> : null}
+                </div>
                 {isLoaded(posts) ?
                     (isLoaded(votes) && isLoaded(comments) && isLoaded(userPosts) &&
                     !isEmpty(posts) && !isEmpty(votes) && !isEmpty(comments) ?
@@ -148,8 +159,7 @@ function HomePage(props) {
                                         return 0;
                                     })
                                     .map(([key, value]) =>
-                                        <motion.div key={`home_${key}`} layout
-                                                    style={{zIndex: 1000, position: 'relative'}}>
+                                        <motion.div key={`home_${key}`} layout>
                                             <PostCard
                                                 id={key}
                                                 content={value.content}

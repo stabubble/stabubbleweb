@@ -37,6 +37,14 @@ function NewCommentPage(props) {
 
     return (
         <Page
+            onKeyDown={(event) => {
+                if (!event.shiftKey && (event.key === "Enter" || event.key === "NumpadEnter")) {
+                    if (isLoaded(user) && !isEmpty(user) && data) {
+                        addComment();
+                        history.goBack();
+                    }
+                }
+            }}
             renderToolbar={() =>
                 <Toolbar>
                     <div className="left">

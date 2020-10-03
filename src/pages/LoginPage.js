@@ -36,20 +36,25 @@ function LoginPage(props) {
         }
     }
 
-
     return (
-        <Page renderToolbar={() =>
-            <Toolbar>
-                <div className="left">
-                    <BackButton onClick={() => history.goBack()}>
-                        back
-                    </BackButton>
-                </div>
-                <div className="center">
-                    enter the bubble
-                </div>
-            </Toolbar>}
-              contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
+        <Page
+            onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === "NumpadEnter") {
+                    doLogin();
+                }
+            }}
+            renderToolbar={() =>
+                <Toolbar>
+                    <div className="left">
+                        <BackButton onClick={() => history.goBack()}>
+                            back
+                        </BackButton>
+                    </div>
+                    <div className="center">
+                        enter the bubble
+                    </div>
+                </Toolbar>}
+            contentStyle={{padding: 0, maxWidth: 768, margin: '0 auto'}}>
             <div style={{
                 display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column',
                 paddingLeft: 5, paddingRight: 5

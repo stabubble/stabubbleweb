@@ -137,8 +137,7 @@ function MyPage(props) {
                                     return 0;
                                 })
                                 .map(([key, value]) =>
-                                    <motion.div key={`me_${key}`} layout
-                                                style={{zIndex: 1000, position: 'relative'}}>
+                                    <motion.div key={`me_${key}`} layout>
                                         <PostCard
                                             id={key}
                                             content={value.content}

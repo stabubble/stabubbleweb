@@ -41,7 +41,7 @@ function PostCard(props) {
                     }
             }
             swipeRight={props.canDelete ?
-                null
+                undefined
                 :
                 {
                     content: <div>
@@ -67,7 +67,8 @@ function PostCard(props) {
         >
             <Card style={{
                 width: '100%', display: 'grid',
-                gridTemplateColumns: 'minmax(0px, max-content) minmax(0, 1fr) minmax(0px, max-content)'
+                gridTemplateColumns: 'minmax(0px, max-content) minmax(0, 1fr) minmax(0px, max-content)',
+                backgroundColor: props.hightlightBackground ? 'snow' : 'white'
             }}>
                 <div style={{gridRow: '1/1', justifySelf: 'start'}}>
                     <Icon
@@ -138,10 +139,26 @@ function PostCard(props) {
                         </div>
                     </Icon>
                 </div>
-                <div style={{position: 'absolute', bottom: 20, color: 'gray', fontSize: 'small'}}>
+                <div style={{
+                    position: 'absolute', bottom: 20, color: 'gray',
+                    fontSize: props.comment ? 'x-small' : 'small'
+                }}>
                     {props.created ? <TimeAgo date={props.created}/> : null}
                     {props.location ? <span> @ {props.location}</span> : null}
                 </div>
+                {props.canDelete ?
+                    <div style={{position: 'absolute', top: 10, right: -10, color: 'gray', fontSize: 'small'}}>
+                        <Icon
+                            size={15}
+                            icon={'fa-trash'}
+                            fixedWidth={true}
+                            style={{paddingRight: 20}}
+                            onClick={() => {
+                                setDisplayWarning(true)
+                            }}>
+                        </Icon>
+                    </div>
+                    : null}
                 {props.commentsLength >= 0 ?
                     <div style={{position: 'absolute', bottom: 20, right: 20, color: 'gray', fontSize: 'small'}}>
                         {props.commentsLength} replies

@@ -130,8 +130,7 @@ function PostPage(props) {
                 isLoaded(comments) && isLoaded(commentsVotes) && isLoaded(userComments)) ?
                 (!isEmpty(post) ?
                     <div>
-                        <motion.div key={`post_${postId}`}
-                                    style={{zIndex: 1000, position: 'relative'}}>
+                        <motion.div key={`post_${postId}`}>
                             <PostCard
                                 id={postId}
                                 content={post.content}
@@ -145,6 +144,7 @@ function PostPage(props) {
                                 deletePost={doDeletePost}
                                 commentsLength={Object.keys(comments ?? {}).length}
                                 disableClick={true}
+                                hightlightBackground={true}
                             />
                         </motion.div>
                         <hr style={{margin: 0, borderColor: '#cfcfc4', borderWidth: 2, borderStyle: 'solid'}}/>
@@ -178,8 +178,7 @@ function PostPage(props) {
                                             return 0;
                                         })
                                         .map(([key, value]) =>
-                                            <motion.div key={key} layout
-                                                        style={{zIndex: 1000, position: 'relative'}}>
+                                            <motion.div key={key} layout>
                                                 <PostCard
                                                     id={key}
                                                     content={value.content}
@@ -192,6 +191,7 @@ function PostPage(props) {
                                                     votePostDown={voteCommentDown}
                                                     deletePost={doDeleteComment}
                                                     disableClick={true}
+                                                    comment={true}
                                                 />
                                             </motion.div>
                                         )}
@@ -206,8 +206,7 @@ function PostPage(props) {
                     : <Redirect to={{pathname: "/"}}/>)
                 :
                 <div>
-                    <motion.div key={`post_${postId}`}
-                                style={{zIndex: 1000, position: 'relative'}}>
+                    <motion.div key={`post_${postId}`}>
                         <PostCard
                             id={postId}
                             content="Loading"
