@@ -54,7 +54,7 @@ function NewCommentPage(props) {
                     <div style={{height: '100%'}}>
                         <ToolbarButton
                             style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10}}
-                            disabled={!isLoaded(user) || isEmpty(user)}
+                            disabled={!isLoaded(user) || isEmpty(user) || !data}
                             onClick={() => {
                                 addComment();
                                 history.goBack();

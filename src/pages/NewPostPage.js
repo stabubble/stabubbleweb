@@ -56,7 +56,7 @@ function NewPostPage(props) {
                         <ToolbarButton
                             style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10}}
                             disabled={!isLoaded(user) || !isLoaded(userProfile)
-                            || isEmpty(user) || isEmpty(userProfile)}
+                            || isEmpty(user) || isEmpty(userProfile) || !data}
                             onClick={() => {
                                 addPost();
                                 history.push('/');

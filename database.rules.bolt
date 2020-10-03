@@ -268,7 +268,7 @@ type Profile {
     location: String
 
     validate() {
-        this.location.length <= 20
+        this.length > 0 && this.location.length <= 20
     }
 }
 
@@ -276,13 +276,13 @@ type TextMessageWithLocation extends TextMessage {
     location: String
 
     validate() {
-        this.location.length <= 20
+        this.length > 0 && this.location.length <= 20
     }
 }
 
 type TextMessageContent extends String {
     validate() {
-        this.length <= 280
+        this.length > 0 && this.length <= 280
     }
 }
 

@@ -5,7 +5,8 @@ function NewText(props) {
         <div style={{position: 'relative'}}>
         <textarea className="textarea" rows="10" placeholder="what do you want in your bubble?"
                   style={{width: '100%', backgroundColor: 'white', fontFamily: 'Grandstander'}}
-                  onChange={(ev) => props.setData(ev.target.value)}
+                  onChange={(ev) => ev.target.value.length <= props.maxLength ?
+                      props.setData(ev.target.value) : null}
                   value={props.data}
         />
             <div style={{position: 'absolute', right: 10, bottom: 10}}>
