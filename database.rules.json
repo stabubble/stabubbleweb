@@ -7,7 +7,7 @@
     },
     "users": {
       "$userId": {
-        ".validate": "(newData.hasChildren(['location']) && newData.child('location').val().length <= 20)",
+        ".validate": "((newData.hasChildren(['location']) && newData.val().length > 0) && newData.child('location').val().length <= 20)",
         "location": {
           ".validate": "newData.isString()"
         },
@@ -49,12 +49,12 @@
       "data": {
         "posts": {
           "$postId": {
-            ".validate": "((newData.hasChildren(['type', 'content', 'location', 'modified', 'created']) && newData.child('type').val() == 'text') && newData.child('location').val().length <= 20)",
+            ".validate": "(((newData.hasChildren(['type', 'content', 'location', 'modified', 'created']) && newData.child('type').val() == 'text') && newData.val().length > 0) && newData.child('location').val().length <= 20)",
             "type": {
               ".validate": "newData.isString()"
             },
             "content": {
-              ".validate": "(newData.isString() && newData.val().length <= 280)"
+              ".validate": "((newData.isString() && newData.val().length > 0) && newData.val().length <= 280)"
             },
             "$other": {
               ".validate": "false"
@@ -125,7 +125,7 @@
                 ".validate": "newData.isString()"
               },
               "content": {
-                ".validate": "(newData.isString() && newData.val().length <= 280)"
+                ".validate": "((newData.isString() && newData.val().length > 0) && newData.val().length <= 280)"
               },
               "$other": {
                 ".validate": "false"
