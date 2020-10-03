@@ -95,7 +95,8 @@ describe("profile rules", () => {
             })
         );
     });
-
+});
+describe("post rules", () => {
     it("should require users to have post token to update/create a post but not others", async () =>{
         const alice = getAuthedDatabase({ uid: "alice" });
         const bob = getAuthedDatabase({ uid: "bob" });
@@ -250,6 +251,54 @@ describe("profile rules", () => {
 
     });
 
+    it("should require users to have post token to delete a post but not others", async () =>{
+        const alice = getAuthedDatabase({ uid: "alice" });
+        const bob = getAuthedDatabase({ uid: "bob" });
+        const noone = getAuthedDatabase(null);
+
+        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
+        alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:{
+                    type: 'text',
+                    content: "test",
+                    location: 'test',
+                    created: firebase.database.ServerValue.TIMESTAMP,
+                    modified: firebase.database.ServerValue.TIMESTAMP
+                },
+                [`data/votes/${aliceKey.key}`]:{
+                    up: 0,
+                    down: 0
+                },
+            })
+        await firebase.assertFails(
+
+            bob.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:null,
+                [`data/votes/${aliceKey.key}`]:null,
+                [`owner/alice/posts/${aliceKey.key}`]:null
+            })
+        );
+        await firebase.assertFails(
+
+            noone.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:null,
+                [`data/votes/${aliceKey.key}`]:null,
+                [`owner/alice/posts/${aliceKey.key}`]:null
+            })
+        );
+
+
+        await firebase.assertSucceeds(
+
+            alice.ref(`posts`).update({
+                [`data/posts/${aliceKey.key}`]:null,
+                [`data/votes/${aliceKey.key}`]:null,
+                [`owner/alice/posts/${aliceKey.key}`]:null
+            })
+        );
+    });
+});
+describe("comment rules", () =>{
     it("should require users to have comment token to update/create a comment but not others", async () =>{
         const alice = getAuthedDatabase({ uid: "alice" });
         const bob = getAuthedDatabase({ uid: "bob" });
@@ -320,7 +369,6 @@ describe("profile rules", () => {
             })
         );
 
-    });
 
     it("should require users to have comment token to update/create a comment but not a random one", async () =>{
         const alice = getAuthedDatabase({ uid: "alice" });
@@ -444,53 +492,7 @@ describe("profile rules", () => {
             alice.ref(`comments/owner/alice/comments/${aliceKey.key}/`).push(true)
         );
     });
-
-    it("should require users to have post token to delete a post but not others", async () =>{
-        const alice = getAuthedDatabase({ uid: "alice" });
-        const bob = getAuthedDatabase({ uid: "bob" });
-        const noone = getAuthedDatabase(null);
-
-        const aliceKey = await alice.ref('posts/owner/alice/posts').push(true);
-        alice.ref(`posts`).update({
-                [`data/posts/${aliceKey.key}`]:{
-                    type: 'text',
-                    content: "test",
-                    location: 'test',
-                    created: firebase.database.ServerValue.TIMESTAMP,
-                    modified: firebase.database.ServerValue.TIMESTAMP
-                },
-                [`data/votes/${aliceKey.key}`]:{
-                    up: 0,
-                    down: 0
-                },
-            })
-        await firebase.assertFails(
-
-            bob.ref(`posts`).update({
-                [`data/posts/${aliceKey.key}`]:null,
-                [`data/votes/${aliceKey.key}`]:null,
-                [`owner/alice/posts/${aliceKey.key}`]:null
-            })
-        );
-        await firebase.assertFails(
-
-            noone.ref(`posts`).update({
-                [`data/posts/${aliceKey.key}`]:null,
-                [`data/votes/${aliceKey.key}`]:null,
-                [`owner/alice/posts/${aliceKey.key}`]:null
-            })
-        );
-
-
-        await firebase.assertSucceeds(
-
-            alice.ref(`posts`).update({
-                [`data/posts/${aliceKey.key}`]:null,
-                [`data/votes/${aliceKey.key}`]:null,
-                [`owner/alice/posts/${aliceKey.key}`]:null
-            })
-        );
-    });
+});
 
     it("should require users to have comment token to delete a comment but not others", async () =>{
         const alice = getAuthedDatabase({ uid: "alice" });
@@ -553,7 +555,8 @@ describe("profile rules", () => {
         );
 
     });
-
+});
+describe("vote rules", () => {
     it("should require users to use your slot to vote, but not someone else's", async() =>{
 
         const alice = getAuthedDatabase({ uid: "alice" });
@@ -678,5 +681,4 @@ describe("profile rules", () => {
             })
         );
     })
-
 });
