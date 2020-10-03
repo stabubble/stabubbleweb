@@ -50,7 +50,7 @@ const rrfProps = {
 
 function App(props) {
     return (
-        <AppContext.Provider value={{version: 0.1, status: 'beta', environment}}>
+        <AppContext.Provider value={{version: 0.2, status: 'beta', environment}}>
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
                     <BrowserRouter>

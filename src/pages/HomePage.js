@@ -110,8 +110,9 @@ function HomePage(props) {
                         <option key="loading">loading</option>
                     </Select>
                 }
-                {isLoaded(posts) && isLoaded(votes) && isLoaded(comments) && isLoaded(userPosts) ?
-                    (!isEmpty(posts) && !isEmpty(votes) && !isEmpty(comments) ?
+                {isLoaded(posts) ?
+                    (isLoaded(votes) && isLoaded(comments) && isLoaded(userPosts) &&
+                    !isEmpty(posts) && !isEmpty(votes) && !isEmpty(comments) ?
                         <SwipeableList
                             scrollStartThreshold={10}
                             swipeStartThreshold={10}

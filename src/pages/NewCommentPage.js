@@ -9,9 +9,9 @@ import {makeTextComment} from "../util/helpers";
 function ComponentTypeSwitcher(props) {
     switch (props.type) {
         case 'text':
-            return <NewText maxLength={140} data={props.data} setData={props.setData}/>
+            return <NewText maxLength={280} data={props.data} setData={props.setData}/>
         default:
-            return <NewText maxLength={140} data={props.data} setData={props.setData}/>
+            return <NewText maxLength={280} data={props.data} setData={props.setData}/>
     }
 }
 

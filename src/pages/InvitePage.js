@@ -79,12 +79,12 @@ function InvitePage() {
                     {userToken.active ?
                         <div style={{paddingTop: 10, width: '100%'}}>
                             <Card>share it with your friend so that they can blow their first bubble!</Card>
-                            <Card>this code will expire in <TimeAgo
-                                date={userToken.created + (24 * 60 * 60 * 1000)}/></Card>
+                            {userToken.created ? <Card>this code will expire in <TimeAgo
+                                date={userToken.created + (24 * 60 * 60 * 1000)}/></Card> : null}
                         </div> :
                         <div style={{paddingTop: 10, width: '100%'}}>
-                            <Card>this code has been used, check again in <TimeAgo
-                                date={userToken.created + (24 * 60 * 60 * 1000)}/> to get a new code</Card>
+                            {userToken.created ? <Card>this code has been used, check again in <TimeAgo
+                                date={userToken.created + (24 * 60 * 60 * 1000)}/> to get a new code</Card> : null}
                             <Card>you can only invite one friend every 24 hours</Card>
                         </div>
                     }

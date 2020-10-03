@@ -137,7 +137,8 @@ function PostCard(props) {
                     </Icon>
                 </div>
                 <div style={{position: 'absolute', bottom: 20, color: 'gray', fontSize: 'small'}}>
-                    <TimeAgo date={props.created}/>{props.location ? <span> @ {props.location}</span> : null}
+                    {props.created ? <TimeAgo date={props.created}/> : null}
+                    {props.location ? <span> @ {props.location}</span> : null}
                 </div>
                 {props.commentsLength >= 0 ?
                     <div style={{position: 'absolute', bottom: 20, right: 20, color: 'gray', fontSize: 'small'}}>
