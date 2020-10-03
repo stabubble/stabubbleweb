@@ -96,7 +96,7 @@ function PostCard(props) {
                     </Icon>
                 </div>
                 <div style={{
-                    gridRow: '1/1', overflowWrap: 'break-word', hyphens: 'auto',
+                    gridRow: '1/1', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'pre-wrap',
                     paddingLeft: 40, paddingRight: 40, paddingBottom: 40, fontFamily: 'Grandstander'
                 }}
                      onClick={() => {
