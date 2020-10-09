@@ -15,19 +15,7 @@ function PostCard(props) {
         <SwipeableListItem
             threshold={0.1}
             swipeLeft={
-                props.canDelete ?
-                    {
-                        content: <div>
-                            <Icon
-                                size={40}
-                                icon={'fa-trash'}
-                                fixedWidth={true}
-                                style={{paddingRight: 20}}
-                            />
-                        </div>,
-                        action: () => setDisplayWarning(true)
-                    }
-                    :
+                props.canVote ?
                     {
                         content: <div>
                             <Icon
@@ -38,11 +26,9 @@ function PostCard(props) {
                             />
                         </div>,
                         action: () => props.votePostDown(props.id)
-                    }
+                    } : null
             }
-            swipeRight={props.canDelete ?
-                undefined
-                :
+            swipeRight={props.canVote ?
                 {
                     content: <div>
 
@@ -55,6 +41,7 @@ function PostCard(props) {
                     </div>,
                     action: () => props.votePostUp(props.id)
                 }
+                : null
             }
             onSwipeStart={() => {
                 setIsSwiping(true);
@@ -68,7 +55,7 @@ function PostCard(props) {
             <Card style={{
                 width: '100%', display: 'grid',
                 gridTemplateColumns: 'minmax(0px, max-content) minmax(0, 1fr) minmax(0px, max-content)',
-                backgroundColor: props.hightlightBackground ? 'snow' : 'white'
+                backgroundColor: props.backgroundColor ?? 'white'
             }}>
                 <div style={{gridRow: '1/1', justifySelf: 'start'}}>
                     <Icon
@@ -147,7 +134,7 @@ function PostCard(props) {
                     {props.location ? <span> @ {props.location}</span> : null}
                 </div>
                 {props.canDelete ?
-                    <div style={{position: 'absolute', top: 10, right: -10, color: 'gray', fontSize: 'small'}}>
+                    <div style={{position: 'absolute', top: 5, right: -10, color: 'gray', fontSize: 'small'}}>
                         <Icon
                             size={15}
                             icon={'fa-trash'}

@@ -11,6 +11,9 @@ import {AnimatePresence, motion} from "framer-motion";
 import {locations, locationsAndWelcome} from "../constants";
 import {deletePost, togglePostVoteDown, togglePostVoteUp} from "../util/helpers";
 
+import leftArrow from '../images/left_arrow.png';
+import rightArrow from '../images/right_arrow.png';
+
 function HomePage(props) {
     const firebase = useFirebase();
     const user = useSelector((state) => state.firebase.auth) ?? {};
@@ -120,6 +123,24 @@ function HomePage(props) {
                     }
                     {userProfile?.location === 'welcome' ? <span>(tap/click to change)</span> : null}
                 </div>
+                {userProfile?.location === 'welcome' ?
+                    <div style={{paddingLeft: 10, paddingRight: 10}}>
+                        <div style={{
+                            width: '100%', display: 'inline-flex', justifyContent: 'flex-end',
+                            alignItems: 'center', minHeight: 40
+                        }}>
+                            swipe right to like a post<img style={{height: 40, paddingLeft: 10}}
+                                                           src={rightArrow} alt="right arrow"/>
+                        </div>
+                        <div style={{
+                            width: '100%', display: 'inline-flex', justifyContent: 'flex-start',
+                            alignItems: 'center', minHeight: 40
+                        }}>
+                            <img style={{height: 40, paddingRight: 10}}
+                                 src={leftArrow} alt="left arrow"/> swipe left to dislike
+                        </div>
+
+                    </div> : null}
                 {isLoaded(posts) ?
                     (isLoaded(votes) && isLoaded(comments) && isLoaded(userPosts) &&
                     !isEmpty(posts) && !isEmpty(votes) && !isEmpty(comments) ?
@@ -165,12 +186,14 @@ function HomePage(props) {
                                                 upVotes={value.upVotes}
                                                 downVotes={value.downVotes}
                                                 created={value.created}
-                                                canDelete={value.owner}
+                                                canVote={!value.owner}
                                                 voteDirection={value.voteDirection}
                                                 votePostUp={votePostUp}
                                                 votePostDown={votePostDown}
                                                 deletePost={doDeletePost}
                                                 commentsLength={value.commentsLength}
+                                                canDelete={false}
+                                                backgroundColor={value.owner ? 'mintcream' : null}
                                             />
                                         </motion.div>
                                     )}
