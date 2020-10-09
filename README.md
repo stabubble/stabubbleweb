@@ -1,4 +1,51 @@
+# St Andrews Anonymous Chat (stabubble)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Project structure
+The project consists of three parts:
+
+- Client JS application on browser
+- Web server serving client JS application and its assets
+- Firebase Realtime Database
+
+### `/`
+The top directory contains following files.
+#### `database.rules.bolt`
+Firebase-bolt database rules describing access control rules in bolt language.
+This allows functions to be defined for validation, allowing much more readable rules when describing more complex rules.
+This practically defines the database.
+
+#### `database.rules.json`
+Firebase json database rules compiled from the firebase-bolt database rules.
+
+Use `firebase-bolt -d database.rules.bolt` to compile.
+
+#### `database.spec.js`
+Firebase database test framework file defining unit tests.
+In order to execute unit test following must be done first:
+1. database.rules.json has to be compiled from database.rules.bolt.
+2. database emulator has to be running: e.g. `firebase emulator:start --only database`
+
+Then, execute:
+
+    `npm run test-database`
+
+Any changes to the bolt database rules must be compiled down to json using `firebase-bolt -d database.rules.bolt`.
+
+### `functions/`
+Server side code for Google Cloud Functions.
+
+### `public/`
+Stores static assets served from the Google Cloud functions.
+
+### `src/`
+Stores client JS application source code served from Google Cloud functions.
+
+### `test/`
+Stores testing framework library code.
+
+
 
 ## Available Scripts
 
