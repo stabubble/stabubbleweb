@@ -23,7 +23,7 @@ exports.generateToken = functions.https.onCall(async (data, context) => {
     const activeTokensRef = tokenRef.child('active');
     const userToken = await userTokenRef.once('value');
     if (userToken.exists()) {
-        if (userToken.created > (Date.now() - (24 * 60 * 60 * 1000))) {
+        if (userToken.created > (Date.now() - (60 * 60 * 1000))) {
             return;
         }
     }
@@ -58,7 +58,7 @@ exports.register = functions.https.onCall(async (data, context) => {
         const activeTokenRef = admin.database().ref(`token/active`).child(token);
         const activeToken = await activeTokenRef.once('value');
         const tokenExists = activeToken.exists();
-        const tokenValid = activeToken.val() > (Date.now() - (24 * 60 * 60 * 1000));
+        const tokenValid = activeToken.val() > (Date.now() - (60 * 60 * 1000));
         const util = require('util');
         if ((tokenExists && tokenValid) ||
             (token === 'staipaddr' &&
