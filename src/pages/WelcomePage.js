@@ -37,11 +37,11 @@ function WelcomePage(props) {
                 </div>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
                         onClick={() => history.push('/agree')}>
-                    join the bubble
+                    join the bubble (register)
                 </Button>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
                         onClick={() => history.push('/login')}>
-                    enter the bubble
+                    enter the bubble (log in)
                 </Button>
             </div>
         </Page>
