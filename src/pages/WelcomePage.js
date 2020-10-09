@@ -26,7 +26,10 @@ function WelcomePage(props) {
                 <motion.div initial={{rotate: 360, scale: 0}} animate={{rotate: 0, scale: 1}}
                             transition={{duration: 0.5}} style={{paddingTop: 30}}>
                     <img src={logo} alt="stabubble logo"
-                         style={{width: '30%', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}/>
+                         style={{
+                             width: '30%', display: 'block', marginLeft: 'auto', marginRight: 'auto',
+                             borderRadius: 30
+                         }}/>
                 </motion.div>
                 <div style={{paddingLeft: 10, paddingRight: 10, textAlign: 'center'}}>
                     <h1>st andrews anonymous chat
