@@ -24,14 +24,14 @@ jobs:
       run: npm i -g firebase-bolt
     - name: Install dependencies
       run: npm ci
+    - name: Install functions dependencies
+      run: npm --prefix ./functions ci
     - name: Run react build
       run: npm run build
     - name: Run database rules test
       run: firebase emulators:exec --only database "npm run test-database"
     - name: Run database rules conversion check
       run: firebase-bolt database.rules.bolt
-    - name: Run functions lint
-      run: npm --prefix ./functions ci
     - name: Run functions lint
       run: npm --prefix ./functions run lint
 
