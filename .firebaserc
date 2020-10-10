@@ -1,7 +1,6 @@
 {
   "projects": {
-    "default": "stabubble",
-    "staging": "stabubble-staging",
-    "prod": "stabubble"
+    "prod": "stabubble",
+    "staging": "stabubble-staging"
   }
 }
