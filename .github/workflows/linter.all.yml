@@ -4,18 +4,14 @@
 ## Linter GitHub Actions ##
 ###########################
 ###########################
-name: Lint Code Base - All
+name: Lint Code Base Run All
 
 #
 # Documentation:
 # https://help.github.com/en/articles/workflow-syntax-for-github-actions
 #
 
-#############################
-# Start the job on all push #
-#############################
-on:
-  workflow_dispatch
+on: workflow_dispatch
 
 ###############
 # Set the Job #
