@@ -24,8 +24,6 @@ jobs:
       run: npm ci
     - name: Run build
       run: npm run build
-    - name: Run test
-      run: firebase emulators:exec --only database "npm run test-database"
     - name: Deploy firebase
       run: firebase -P staging deploy
       env:
