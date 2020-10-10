@@ -1,4 +1,49 @@
+# St Andrews Anonymous Chat (stabubble)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Project structure
+The project consists of three parts:
+
+- React Web App hosted on Firebase Hosting
+- Firebase Realtime Database with security rules
+- Firebase Functions running server side functions
+
+### `/`
+The top directory contains following files.
+#### `database.rules.bolt`
+Firebase Realtime Database rules describing access control rules in bolt language.
+This allows functions to be defined for validation, allowing much more readable rules when describing more complex rules.
+This practically defines the database.
+
+#### `database.rules.json`
+Firebase json database rules compiled from the firebase-bolt database rules.
+
+Use `firebase-bolt database.rules.bolt` to compile.
+
+#### `database.spec.js`
+Firebase database test framework file defining unit tests.
+To run the tests locally:
+1. database.rules.json has to be compiled from database.rules.bolt.
+2. database emulator has to be running: e.g. `firebase emulator:start --only database`
+3. `npm run test-database`
+
+Any changes to the bolt database rules must be compiled down to json using `firebase-bolt database.rules.bolt`.
+
+### `functions/`
+Server side code for Google Cloud Functions.
+
+### `public/`
+Static assets for the React app.
+
+### `src/`
+React app
+
+### `test/`
+Stores testing framework library code from:
+[firebase rules github](https://github.com/firebase/firebase-js-sdk/tree/master/packages/rules-unit-testing)
+
+Edited from original due to assertion bug
 
 ## Available Scripts
 
@@ -45,24 +90,24 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ### Code Splitting
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+This section has moved [here](https://facebook.github.io/create-react-app/docs/code-splitting)
 
 ### Analyzing the Bundle Size
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+This section has moved [here](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
 ### Making a Progressive Web App
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+This section has moved [here](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
 ### Advanced Configuration
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+This section has moved [here](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
 ### Deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+This section has moved [here](https://facebook.github.io/create-react-app/docs/deployment)
 
 ### `npm run build` fails to minify
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+This section has moved [here](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
