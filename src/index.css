@@ -2,7 +2,7 @@
   font-family: 'Comfortaa';
   src: url('./fonts/Comfortaa.ttf') format('woff2 supports variations'),
   url('./fonts/Comfortaa.ttf') format('woff2-variations');
-  font-weight: 100 300;
+  font-weight: 300 700;
   font-stretch: 25% 151%;
 }
 

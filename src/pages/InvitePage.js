@@ -32,7 +32,7 @@ function InvitePage() {
         if (isEmpty(userToken)) {
             await doGenerateToken();
         } else {
-            if (userToken?.created < (Date.now() - (24 * 60 * 60 * 1000))) {
+            if (userToken?.created < (Date.now() - (60 * 60 * 1000))) {
                 await doGenerateToken();
             } else {
                 setGettingToken(false);
@@ -48,7 +48,7 @@ function InvitePage() {
 
     return (
         isLoaded(userToken) && !isEmpty(userToken) &&
-        userToken?.created > (Date.now() - (24 * 60 * 60 * 1000)) ?
+        userToken?.created > (Date.now() - (60 * 60 * 1000)) ?
             <Page renderToolbar={() =>
                 <Toolbar>
                     <div className="left">
@@ -80,12 +80,12 @@ function InvitePage() {
                         <div style={{paddingTop: 10, width: '100%'}}>
                             <Card>share it with your friend so that they can blow their first bubble!</Card>
                             {userToken.created ? <Card>this code will expire in <TimeAgo
-                                date={userToken.created + (24 * 60 * 60 * 1000)}/></Card> : null}
+                                date={userToken.created + (60 * 60 * 1000)}/></Card> : null}
                         </div> :
                         <div style={{paddingTop: 10, width: '100%'}}>
                             {userToken.created ? <Card>this code has been used, check again in <TimeAgo
-                                date={userToken.created + (24 * 60 * 60 * 1000)}/> to get a new code</Card> : null}
-                            <Card>you can only invite one friend every 24 hours</Card>
+                                date={userToken.created + (60 * 60 * 1000)}/> to get a new code</Card> : null}
+                            <Card>you can get a new code every hour</Card>
                         </div>
                     }
                 </div>

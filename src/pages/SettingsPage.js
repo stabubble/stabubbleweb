@@ -86,7 +86,10 @@ function SettingsPage(props) {
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
                 <div style={{paddingTop: 30}}>
                     <img src={logo} alt="stabubble logo"
-                         style={{width: '30%', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}/>
+                         style={{
+                             width: '30%', display: 'block', marginLeft: 'auto', marginRight: 'auto',
+                             borderRadius: 30
+                         }}/>
                 </div>
                 <div style={{paddingLeft: 10, paddingRight: 10, textAlign: 'center'}}>
                     <h1>st andrews anonymous chat

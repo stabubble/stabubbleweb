@@ -69,7 +69,7 @@ function LoginPage(props) {
                 {isLoggingIn ?
                     <ProgressCircular indeterminate/> :
                     <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
-                            onClick={doLogin}>enter!</Button>
+                            onClick={doLogin}>log in and enter!</Button>
                 }
             </div>
             <AlertDialog isOpen={displayError} onCancel={() => setDisplayError(false)} cancelable>
