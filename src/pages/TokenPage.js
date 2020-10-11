@@ -126,7 +126,7 @@ function TokenPage(props) {
                     {isRegistering ?
                         <ProgressCircular indeterminate/> :
                         <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
-                                onClick={doRegister}>join!</Button>
+                                onClick={doRegister}>register and join!</Button>
                     }
                 </div>
                 <AlertDialog isOpen={displayError} onCancel={() => setDisplayError(false)} cancelable>

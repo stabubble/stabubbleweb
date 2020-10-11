@@ -23,7 +23,8 @@ function RegisterPage() {
             }}>
                 <div style={{paddingTop: 10, width: '100%'}}>
                     <Card>write down, copy the passphrase or screenshot this screen</Card>
-                    <Card>you will need it to login again</Card>
+                    <Card>you will need it to login</Card>
+                    <Card>you <strong>won't</strong> see it again!</Card>
                 </div>
                 <div style={{paddingTop: 10, width: '100%'}}>
                     <Card style={{backgroundColor: '#ffb347'}}>
@@ -34,7 +35,10 @@ function RegisterPage() {
                     </Card>
                 </div>
                 <div style={{paddingTop: 10, width: '100%'}}>
-                    <Card>you won't see it again!</Card>
+                    <Card><strong>don't</strong> share this passphrase with anyone else!</Card>
+                    <Card>otherwise, they will be able to see your activity</Card>
+                    <Card>this is <strong>not</strong> the code to invite a friend, you can find that at:
+                        me -> settings -> invite</Card>
                 </div>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
                         onClick={() => history.replace('/')}>i have saved it!</Button>
