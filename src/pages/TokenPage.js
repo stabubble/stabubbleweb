@@ -24,7 +24,7 @@ function TokenPage(props) {
                     token: registerResult.data.token
                 });
                 history.push('/register', {passphrase: registerResult.data.passphrase});
-                await firebase.updateProfile({location: 'welcome'});
+                await firebase.updateProfile({location: 'all', voteHelp: 3});
             } else {
                 setTryingIp(false);
             }
@@ -46,7 +46,7 @@ function TokenPage(props) {
                     token: registerResult.data.token
                 });
                 history.push('/register', {passphrase: registerResult.data.passphrase});
-                await firebase.updateProfile({location: 'welcome'});
+                await firebase.updateProfile({location: 'all', voteHelp: 3});
             } else {
                 setDisplayError(true);
                 setErrorMessage({title: 'token invalid', message: 'try again or try with different token'});
@@ -126,7 +126,7 @@ function TokenPage(props) {
                     {isRegistering ?
                         <ProgressCircular indeterminate/> :
                         <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
-                                onClick={doRegister}>join!</Button>
+                                onClick={doRegister}>register and join!</Button>
                     }
                 </div>
                 <AlertDialog isOpen={displayError} onCancel={() => setDisplayError(false)} cancelable>

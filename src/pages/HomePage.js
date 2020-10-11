@@ -8,7 +8,7 @@ import {isEmpty, isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-fi
 
 import {AnimatePresence, motion} from "framer-motion";
 
-import {locations, locationsAndWelcome} from "../constants";
+import {locations} from "../constants";
 import {deletePost, togglePostVoteDown, togglePostVoteUp} from "../util/helpers";
 
 import leftArrow from '../images/left_arrow.png';
@@ -18,6 +18,9 @@ function HomePage(props) {
     const firebase = useFirebase();
     const user = useSelector((state) => state.firebase.auth) ?? {};
     const userProfile = useSelector((state) => state.firebase.profile);
+
+    const locationsMap = locations.reduce((acc, location) =>
+        ({...acc, [location.id]: location.name}), {});
 
     const [activeSegment, setActiveSegment] = useState(0);
 
@@ -30,7 +33,8 @@ function HomePage(props) {
         },
         {
             path: '/posts/data/posts',
-            queryParams: ['orderByChild=location', `equalTo=${userProfile.location}`, "limitToLast=200"],
+            queryParams: userProfile?.location === 'all' ? ['limitToLast=200'] :
+                ['orderByChild=location', `equalTo=${userProfile.location}`, 'limitToLast=200'],
             storeAs: 'filteredPosts'
         },
     ], [user, userProfile]);
@@ -52,11 +56,11 @@ function HomePage(props) {
     const userPosts = useSelector((state) => state.firebase.data?.posts?.owner?.[user.uid]);
 
     const votePostUp = async (postId) => {
-        await togglePostVoteUp(firebase, user, userPosts, postId);
+        await togglePostVoteUp(firebase, user, userPosts, postId, userProfile);
     }
 
     const votePostDown = async (postId) => {
-        await togglePostVoteDown(firebase, user, userPosts, postId);
+        await togglePostVoteDown(firebase, user, userPosts, postId, userProfile);
     }
 
     const doDeletePost = async (postId) => {
@@ -111,19 +115,16 @@ function HomePage(props) {
                                 style={{paddingLeft: 15, paddingRight: 15}}
                                 onChange={updateLocation}
                         >
-                            {userProfile?.location === 'welcome' ?
-                                locationsAndWelcome.map(loc => <option key={loc.id}
-                                                                       value={loc.id}>{loc.name}</option>) :
-                                locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
+                            {locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
                         </Select>
                         :
                         <Select value="loading" style={{paddingLeft: 15, paddingRight: 15}}>
                             <option key="loading">loading</option>
                         </Select>
                     }
-                    {userProfile?.location === 'welcome' ? <span>(tap/click to change)</span> : null}
+                    {userProfile?.voteHelp > 0 ? <span>(tap/click to change)</span> : null}
                 </div>
-                {userProfile?.location === 'welcome' ?
+                {userProfile?.voteHelp > 0 ?
                     <div style={{paddingLeft: 10, paddingRight: 10}}>
                         <div style={{
                             width: '100%', display: 'inline-flex', justifyContent: 'flex-end',
@@ -194,6 +195,8 @@ function HomePage(props) {
                                                 commentsLength={value.commentsLength}
                                                 canDelete={false}
                                                 backgroundColor={value.owner ? 'mintcream' : null}
+                                                location={userProfile?.location === 'all' ?
+                                                    locationsMap?.[value.location] ?? 'unknown location' : null}
                                             />
                                         </motion.div>
                                     )}

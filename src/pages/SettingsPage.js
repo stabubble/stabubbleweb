@@ -48,18 +48,19 @@ function SettingsPage(props) {
     }
 
     const doAction = async () => {
+        setDisplayWarning(false);
         switch (warningAction) {
             case 'logout':
                 logout();
                 break;
             case 'logoutAll':
                 const logoutAll = firebase.functions().httpsCallable('logoutAll');
-                await logoutAll();
+                logoutAll();
                 logout();
                 break;
             case 'deleteAccount':
                 const deleteUser = firebase.functions().httpsCallable('deleteUser');
-                await deleteUser();
+                deleteUser();
                 logout();
                 break;
             default:
@@ -86,7 +87,10 @@ function SettingsPage(props) {
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
                 <div style={{paddingTop: 30}}>
                     <img src={logo} alt="stabubble logo"
-                         style={{width: '30%', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}/>
+                         style={{
+                             width: '30%', display: 'block', marginLeft: 'auto', marginRight: 'auto',
+                             borderRadius: 30
+                         }}/>
                 </div>
                 <div style={{paddingLeft: 10, paddingRight: 10, textAlign: 'center'}}>
                     <h1>st andrews anonymous chat

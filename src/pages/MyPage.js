@@ -7,13 +7,13 @@ import {isEmpty, isLoaded, useFirebase, useFirebaseConnect} from "react-redux-fi
 import {useSelector} from "react-redux";
 import {deletePost, togglePostVoteDown, togglePostVoteUp} from "../util/helpers";
 import {AnimatePresence, motion} from "framer-motion";
-import {locationsAndWelcome} from "../constants";
+import {locations} from "../constants";
 
 function MyPage(props) {
     const history = useHistory();
     const [activeSegment, setActiveSegment] = useState(0);
 
-    const locationsMap = locationsAndWelcome.reduce((acc, location) =>
+    const locationsMap = locations.reduce((acc, location) =>
         ({...acc, [location.id]: location.name}), {});
 
     const firebase = useFirebase();

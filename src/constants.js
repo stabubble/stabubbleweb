@@ -1,10 +1,11 @@
 export const locations = [
-    {id: 'main_library', name: 'main library'},
-    {id: 'north_street', name: 'north street'},
+    {id: 'all', name: 'st andrews bubble (all locations)'},
     {id: 'market_street', name: 'market street'},
+    {id: 'north_street', name: 'north street'},
     {id: 'south_street', name: 'south street'},
     {id: 'north_haugh', name: 'north haugh'},
     {id: 'union', name: 'union'},
+    {id: 'main_library', name: 'main library'},
     {id: 'dra', name: 'dra & fife park'},
     {id: 'abh', name: 'abh & powell'},
     {id: 'andrew_melville', name: 'andrew melville'},
@@ -18,8 +19,3 @@ export const locations = [
     {id: 'east_shore', name: 'east shore'},
     {id: 'outskirts', name: 'outskirts (badlands)'}
 ];
-
-export const locationsAndWelcome = [
-    {id: 'welcome', name: 'welcome space'},
-    ...locations
-]
