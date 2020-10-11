@@ -39,8 +39,8 @@ function AgreePage(props) {
                 </div>
                 <div style={{paddingTop: 10, width: '100%'}}>
                     <Card>you can add this app to your mobile home screen for easy access</Card>
-                    <Card>on ios: share -> add to home screen</Card>
-                    <Card>on android (chrome): menu -> add to homescreen</Card>
+                    <Card>on ios: share -&gt; add to home screen</Card>
+                    <Card>on android (chrome): menu -&gt; add to homescreen</Card>
                 </div>
                 <div style={{paddingTop: 10, width: '100%'}}>
                     <Card>the app is open source</Card>

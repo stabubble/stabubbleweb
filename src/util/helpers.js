@@ -6,7 +6,7 @@ export const makeTextPost = async (firebase, user, userProfile, data) => {
         [`data/posts/${newPostRef.key}`]: {
             type: 'text',
             content: data,
-            location: userProfile?.location ?? 'welcome',
+            location: userProfile?.location ?? 'market_street',
             created: firebase.database.ServerValue.TIMESTAMP,
             modified: firebase.database.ServerValue.TIMESTAMP
         },
@@ -33,7 +33,10 @@ export const makeTextComment = async (firebase, user, postId, data) => {
     });
 }
 
-export const togglePostVoteUp = async (firebase, user, userObj, postId) => {
+export const togglePostVoteUp = async (firebase, user, userObj, postId, userProfile) => {
+    if (userProfile?.voteHelp > 0) {
+        firebase.updateProfile({voteHelp: firebase.database.ServerValue.increment(-1)});
+    }
     if (userObj?.votes?.[postId] === 'up') {
         await firebase.update('posts', {
             [`owner/${user.uid}/votes/${postId}`]: null,
@@ -56,7 +59,10 @@ export const togglePostVoteUp = async (firebase, user, userObj, postId) => {
     }
 }
 
-export const togglePostVoteDown = async (firebase, user, userPostObj, postId) => {
+export const togglePostVoteDown = async (firebase, user, userPostObj, postId, userProfile) => {
+    if (userProfile?.voteHelp > 0) {
+        firebase.updateProfile({voteHelp: firebase.database.ServerValue.increment(-1)});
+    }
     if (userPostObj?.votes?.[postId] === 'down') {
         await firebase.update('posts', {
             [`owner/${user.uid}/votes/${postId}`]: null,

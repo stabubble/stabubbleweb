@@ -7,9 +7,12 @@
     },
     "users": {
       "$userId": {
-        ".validate": "((newData.hasChildren(['location']) && newData.child('location').val().length > 0) && newData.child('location').val().length <= 20)",
+        ".validate": "((((newData.hasChildren(['location', 'voteHelp']) && newData.child('location').val().length > 0) && newData.child('location').val().length <= 20) && newData.child('voteHelp').val() <= 3) && newData.child('voteHelp').val() >= 0)",
         "location": {
           ".validate": "newData.isString()"
+        },
+        "voteHelp": {
+          ".validate": "newData.isNumber()"
         },
         "$other": {
           ".validate": "false"
@@ -49,7 +52,7 @@
       "data": {
         "posts": {
           "$postId": {
-            ".validate": "(((newData.hasChildren(['type', 'content', 'location', 'modified', 'created']) && newData.child('type').val() == 'text') && newData.child('location').val().length > 0) && newData.child('location').val().length <= 20)",
+            ".validate": "((((newData.hasChildren(['type', 'content', 'location', 'modified', 'created']) && newData.child('type').val() == 'text') && newData.child('location').val().length > 0) && newData.child('location').val().length <= 20) && newData.child('location').val() != 'all')",
             "type": {
               ".validate": "newData.isString()"
             },
@@ -71,7 +74,7 @@
             ".write": "(((data.val() == null && auth != null) && ($postId != null && newData.parent().parent().parent().parent().child('posts').child('owner').child(auth.uid).child('posts').child($postId).val() != null)) || (((data.val() != null && newData.val() == null) && auth != null) && (($postId != null && root.child('posts').child('owner').child(auth.uid).child('posts').child($postId).val() != null) && newData.parent().parent().parent().parent().child('posts').child('owner').child(auth.uid).child('posts').child($postId).val() == null)))",
             ".read": "auth != null"
           },
-          ".read": "(auth != null && ((query.orderByChild == 'location' && query.equalTo == root.child('users').child(auth.uid).child('location').val()) && query.limitToLast <= 200))",
+          ".read": "(auth != null && (((query.orderByChild == 'location' && query.equalTo == root.child('users').child(auth.uid).child('location').val()) && query.limitToLast <= 200) || (root.child('users').child(auth.uid).child('location').val() == 'all' && query.limitToLast <= 200)))",
           ".indexOn": [
             "location"
           ]

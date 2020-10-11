@@ -66,9 +66,16 @@ postDataDeletedAtSameTime (postId) {
 
 // restrict posts to query
 postsQueryOnly() {
+    (
     query.orderByChild == 'location' &&
     query.equalTo == root.users[auth.uid].location &&
     query.limitToLast <= 200
+    )
+    ||
+    (
+    root.users[auth.uid].location == 'all' &&
+    query.limitToLast <= 200
+    )
 }
 
 // owns the postid
@@ -266,9 +273,11 @@ commentRemovedVoteAtSameTimeAndHasVoted (direction, postId,commentId) {
 // ===== Type Definitions =============
 type Profile {
     location: String
+    voteHelp: Number
 
     validate() {
-        this.location.length > 0 && this.location.length <= 20
+        this.location.length > 0 && this.location.length <= 20 &&
+        this.voteHelp <= 3 && this.voteHelp >= 0
     }
 }
 
@@ -276,7 +285,7 @@ type TextMessageWithLocation extends TextMessage {
     location: String
 
     validate() {
-        this.location.length > 0 && this.location.length <= 20
+        this.location.length > 0 && this.location.length <= 20 && this.location != 'all'
     }
 }
 
