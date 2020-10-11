@@ -28,20 +28,21 @@ function PostCard(props) {
                         action: () => props.votePostDown(props.id)
                     } : null
             }
-            swipeRight={props.canVote ?
-                {
-                    content: <div>
+            swipeRight={
+                props.canVote ?
+                    {
+                        content: <div>
 
-                        <Icon
-                            size={40}
-                            icon={'fa-heart'}
-                            fixedWidth={true}
-                            style={{paddingLeft: 20, color: '#ff6961'}}
-                        />
-                    </div>,
-                    action: () => props.votePostUp(props.id)
-                }
-                : null
+                            <Icon
+                                size={40}
+                                icon={'fa-heart'}
+                                fixedWidth={true}
+                                style={{paddingLeft: 20, color: '#ff6961'}}
+                            />
+                        </div>,
+                        action: () => props.votePostUp(props.id)
+                    }
+                    : null
             }
             onSwipeStart={() => {
                 setIsSwiping(true);
@@ -109,7 +110,7 @@ function PostCard(props) {
                             textAlign: 'center'
                         }}
                         onClick={() => {
-                            if (!isSwiping && !props.canVote) {
+                            if (!isSwiping && props.canVote) {
                                 props.votePostDown(props.id);
                             }
                         }}>
