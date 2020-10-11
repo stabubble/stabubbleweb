@@ -273,11 +273,10 @@ commentRemovedVoteAtSameTimeAndHasVoted (direction, postId,commentId) {
 // ===== Type Definitions =============
 type Profile {
     location: String
-    voteHelp: Number
+    voteHelp: Number | Null
 
     validate() {
-        this.location.length > 0 && this.location.length <= 20 &&
-        this.voteHelp <= 3 && this.voteHelp >= 0
+        this.location.length > 0 && this.location.length <= 20
     }
 }
 

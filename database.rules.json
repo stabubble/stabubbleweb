@@ -7,7 +7,7 @@
     },
     "users": {
       "$userId": {
-        ".validate": "((((newData.hasChildren(['location', 'voteHelp']) && newData.child('location').val().length > 0) && newData.child('location').val().length <= 20) && newData.child('voteHelp').val() <= 3) && newData.child('voteHelp').val() >= 0)",
+        ".validate": "((newData.hasChildren(['location']) && newData.child('location').val().length > 0) && newData.child('location').val().length <= 20)",
         "location": {
           ".validate": "newData.isString()"
         },
