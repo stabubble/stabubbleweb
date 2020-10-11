@@ -38,7 +38,7 @@ function RegisterPage() {
                     <Card><strong>don't</strong> share this passphrase with anyone else!</Card>
                     <Card>otherwise, they will be able to see your activity</Card>
                     <Card>this is <strong>not</strong> the code to invite a friend, you can find that at:
-                        me -> settings -> invite</Card>
+                        me -&gt; settings -&gt; invite</Card>
                 </div>
                 <Button modifier="large" style={{marginTop: 10, marginBottom: 10}}
                         onClick={() => history.replace('/')}>i have saved it!</Button>

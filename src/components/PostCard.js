@@ -68,7 +68,7 @@ function PostCard(props) {
                             textAlign: 'center'
                         }}
                         onClick={() => {
-                            if (!isSwiping && !props.canDelete) {
+                            if (!isSwiping && props.canVote) {
                                 props.votePostUp(props.id);
                             }
                         }}>
@@ -109,7 +109,7 @@ function PostCard(props) {
                             textAlign: 'center'
                         }}
                         onClick={() => {
-                            if (!isSwiping && !props.canDelete) {
+                            if (!isSwiping && !props.canVote) {
                                 props.votePostDown(props.id);
                             }
                         }}>
