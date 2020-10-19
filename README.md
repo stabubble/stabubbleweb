@@ -39,6 +39,11 @@ Static assets for the React app.
 ### `src/`
 React app
 
+#### `src/constants.js`
+File intended to contain constants; currently, this only stores locations.
+The locations stored are key-value pair of `id` and `name`.
+`id` must not contain spaces; `name` can contain spaces and should be human-readable.
+
 ### `test/`
 Stores testing framework library code from:
 [firebase rules github](https://github.com/firebase/firebase-js-sdk/tree/master/packages/rules-unit-testing)
