@@ -16,7 +16,7 @@
   "dependencies": {
     "diceware-generator": "^3.0.1",
     "diceware-wordlist-en-eff": "^1.0.1",
-    "firebase-admin": "^9.2.0",
+    "firebase-admin": "^11.4.1",
     "firebase-functions": "^3.11.0",
     "ipaddr.js": "^2.0.0",
     "uuid": "^8.3.0"
